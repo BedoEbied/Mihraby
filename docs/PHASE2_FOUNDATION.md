@@ -1,5 +1,15 @@
 # Mihraby Phase 2 - Implementation Foundation Complete ✅
 
+> **📌 Historical reference.** This document records the scaffolding work
+> (time slots/bookings migrations, types, validators, React Query hooks)
+> that shipped on `develop` as the groundwork for the booking system.
+> **Phase 0 of the canonical [`ROADMAP.md`](./ROADMAP.md) is a hard
+> prerequisite** — it reconciles types, fixes the `bookings.status` enum,
+> adds the `slot_hold` unique index, and wires the connection-aware models
+> that Phase 2 (Booking hold & concurrency) depends on. Read `ROADMAP.md`
+> first; come back here only for historical context on what was already
+> scaffolded.
+
 ## Project: Mihraby (Course Booking & Scheduling System)
 **Repository:** https://github.com/BedoEbied/Tahbeer  
 **Branch:** develop-next-fullstack  
