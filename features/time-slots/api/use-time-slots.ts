@@ -7,8 +7,23 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
-import { ITimeSlot, CreateTimeSlotDTO } from '@/lib/types';
+import {
+  ITimeSlot,
+  CreateTimeSlotDTO,
+  CreateTimeSlotsBulkDTO,
+  UpdateTimeSlotDTO,
+  ApiResponse,
+} from '@/lib/types';
 import { useNotifications } from '@/lib/stores/notifications';
+
+type SlotListPayload = { slots: ITimeSlot[]; count: number };
+
+function unwrap<T>(response: ApiResponse<T>): T {
+  if (!response.success || response.data === undefined || response.data === null) {
+    throw new Error(response.error || response.message || 'Request failed');
+  }
+  return response.data;
+}
 
 const TIME_SLOTS_QUERY_KEYS = {
   all: ['time-slots'] as const,
@@ -18,52 +33,58 @@ const TIME_SLOTS_QUERY_KEYS = {
 };
 
 /**
- * Hook to get all time slots for a course (instructor)
+ * Instructor view — all slots for a course regardless of availability.
  */
 export function useTimeSlots(courseId: number) {
   return useQuery({
     queryKey: TIME_SLOTS_QUERY_KEYS.byCourse(courseId),
+    enabled: Number.isFinite(courseId) && courseId > 0,
     queryFn: async () => {
-      const response = await apiClient.get<ITimeSlot[]>(
+      const response = await apiClient.get<ApiResponse<SlotListPayload>>(
         `/api/instructor/courses/${courseId}/slots`
       );
-      return response;
+      return unwrap(response).slots;
     },
   });
 }
 
 /**
- * Hook to get available time slots for a course (public)
+ * Public student view — only available, future slots.
  */
 export function useAvailableSlots(courseId: number) {
   return useQuery({
     queryKey: TIME_SLOTS_QUERY_KEYS.available(courseId),
+    enabled: Number.isFinite(courseId) && courseId > 0,
     queryFn: async () => {
-      const response = await apiClient.get<ITimeSlot[]>(
+      const response = await apiClient.get<ApiResponse<SlotListPayload>>(
         `/api/courses/${courseId}/slots/available`
       );
-      return response;
+      return unwrap(response).slots;
     },
   });
 }
 
 /**
- * Hook to create new time slots
+ * Create a single slot on a course.
  */
 export function useCreateTimeSlot(courseId: number) {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
 
-  return useMutation({
-    mutationFn: async (data: CreateTimeSlotDTO) => {
-      return await apiClient.post<ITimeSlot>(
+  return useMutation<ITimeSlot, Error, Omit<CreateTimeSlotDTO, 'course_id'>>({
+    mutationFn: async (data) => {
+      const response = await apiClient.post<ApiResponse<ITimeSlot>>(
         `/api/instructor/courses/${courseId}/slots`,
         data
       );
+      return unwrap(response);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: TIME_SLOTS_QUERY_KEYS.byCourse(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: TIME_SLOTS_QUERY_KEYS.available(courseId),
       });
       addNotification({
         type: 'success',
@@ -82,15 +103,57 @@ export function useCreateTimeSlot(courseId: number) {
 }
 
 /**
- * Hook to update a time slot
+ * Bulk create slots on a course.
+ */
+export function useCreateTimeSlotsBulk(courseId: number) {
+  const queryClient = useQueryClient();
+  const { addNotification } = useNotifications();
+
+  return useMutation<ITimeSlot[], Error, Omit<CreateTimeSlotsBulkDTO, 'course_id'>>({
+    mutationFn: async (data) => {
+      const response = await apiClient.post<ApiResponse<SlotListPayload>>(
+        `/api/instructor/courses/${courseId}/slots`,
+        data
+      );
+      return unwrap(response).slots;
+    },
+    onSuccess: (created) => {
+      queryClient.invalidateQueries({
+        queryKey: TIME_SLOTS_QUERY_KEYS.byCourse(courseId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: TIME_SLOTS_QUERY_KEYS.available(courseId),
+      });
+      addNotification({
+        type: 'success',
+        title: 'Slots Created',
+        message: `${created.length} time slots added`,
+      });
+    },
+    onError: (error) => {
+      addNotification({
+        type: 'error',
+        title: 'Creation Failed',
+        message: error instanceof Error ? error.message : 'Unable to create time slots',
+      });
+    },
+  });
+}
+
+/**
+ * Update an existing slot.
  */
 export function useUpdateTimeSlot(slotId: number) {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
 
-  return useMutation({
-    mutationFn: async (data: Partial<CreateTimeSlotDTO>) => {
-      return await apiClient.put<ITimeSlot>(`/api/instructor/slots/${slotId}`, data);
+  return useMutation<ITimeSlot, Error, UpdateTimeSlotDTO>({
+    mutationFn: async (data) => {
+      const response = await apiClient.put<ApiResponse<ITimeSlot>>(
+        `/api/instructor/slots/${slotId}`,
+        data
+      );
+      return unwrap(response);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TIME_SLOTS_QUERY_KEYS.all });
@@ -111,15 +174,20 @@ export function useUpdateTimeSlot(slotId: number) {
 }
 
 /**
- * Hook to delete a time slot
+ * Delete a slot.
  */
 export function useDeleteTimeSlot(slotId: number) {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
 
-  return useMutation({
+  return useMutation<void, Error, void>({
     mutationFn: async () => {
-      return await apiClient.delete(`/api/instructor/slots/${slotId}`);
+      const response = await apiClient.delete<ApiResponse>(
+        `/api/instructor/slots/${slotId}`
+      );
+      if (!response.success) {
+        throw new Error(response.error || response.message || 'Failed to delete slot');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TIME_SLOTS_QUERY_KEYS.all });

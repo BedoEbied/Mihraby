@@ -1,11 +1,18 @@
 import { z } from 'zod';
 
+const meetingPlatformEnum = z.enum(['zoom', 'google_meet', 'manual']);
+
 export const createCourseSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   price: z.number().min(0, 'Price must be a non-negative number'),
   image_url: z.string().url('Invalid image URL').optional(),
-  status: z.enum(['draft', 'published']).optional()
+  status: z.enum(['draft', 'published']).optional(),
+  slot_duration: z.number().int().min(15).max(480).optional(),
+  price_per_slot: z.number().min(0).optional(),
+  meeting_platform: meetingPlatformEnum.optional(),
+  meeting_link: z.string().url('Invalid meeting link').optional(),
+  currency: z.string().length(3).optional(),
 });
 
 export const updateCourseSchema = z.object({
@@ -13,7 +20,12 @@ export const updateCourseSchema = z.object({
   description: z.string().optional(),
   price: z.number().min(0, 'Price must be a non-negative number').optional(),
   image_url: z.string().url('Invalid image URL').optional(),
-  status: z.enum(['draft', 'published', 'archived']).optional()
+  status: z.enum(['draft', 'published', 'archived']).optional(),
+  slot_duration: z.number().int().min(15).max(480).optional(),
+  price_per_slot: z.number().min(0).optional(),
+  meeting_platform: meetingPlatformEnum.optional(),
+  meeting_link: z.string().url('Invalid meeting link').optional(),
+  currency: z.string().length(3).optional(),
 });
 
 export const courseIdSchema = z.object({
