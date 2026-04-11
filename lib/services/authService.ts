@@ -10,7 +10,7 @@ export class AuthService {
    * Register new user
    */
   static async register(data: RegisterDTO): Promise<{ token: string; user: UserWithoutPassword }> {
-    const { email, password, name, role } = data;
+    const { email, password, name } = data;
 
     // Check if user already exists
     const existingUser = await User.findByEmail(email);
@@ -26,7 +26,8 @@ export class AuthService {
       email,
       password: hashedPassword,
       name,
-      role: role || UserRole.STUDENT
+      // Self-registration is always a student. Elevated roles must be assigned by admins.
+      role: UserRole.STUDENT
     });
 
     // Generate token

@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { JwtPayload, UserRole } from '@/types';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_change_this_in_production';
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 /**
@@ -27,6 +27,9 @@ export const comparePassword = async (
  * Generate JWT token
  */
 export const generateToken = (userId: number, email: string, role: UserRole): string => {
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET env var is required');
+  }
   const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
     userId,
     email,
@@ -42,6 +45,9 @@ export const generateToken = (userId: number, email: string, role: UserRole): st
  * Verify and decode JWT token
  */
 export const verifyToken = (token: string): JwtPayload => {
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET env var is required');
+  }
   const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
   return decoded;
 };

@@ -21,7 +21,6 @@ export async function registerAction(formData: FormData) {
       email: formData.get('email') as string,
       password: formData.get('password') as string,
       name: formData.get('name') as string,
-      role: formData.get('role') as string | undefined,
     };
 
     const validatedData = registerSchema.parse(data);
@@ -29,7 +28,7 @@ export async function registerAction(formData: FormData) {
 
     (await cookies()).set(AUTH_COOKIE, result.token, commonCookieOptions);
 
-    return { success: true, data: result };
+    return { success: true, data: { user: result.user } };
   } catch (error) {
     return {
       success: false,
@@ -50,7 +49,7 @@ export async function loginAction(formData: FormData) {
 
     (await cookies()).set(AUTH_COOKIE, result.token, commonCookieOptions);
 
-    return { success: true, data: result };
+    return { success: true, data: { user: result.user } };
   } catch (error) {
     return {
       success: false,

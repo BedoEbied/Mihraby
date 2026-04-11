@@ -25,7 +25,7 @@ export default function LoginPage() {
       const response = await authApi.login(formData);
       
       if (response.success && response.data) {
-        login(response.data.user, response.data.token);
+        login(response.data.user);
         
         // Redirect based on role
         switch (response.data.user.role) {

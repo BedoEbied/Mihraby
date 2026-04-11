@@ -47,13 +47,16 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     }
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const makeRequest = async () =>
+    fetch(`${BASE_URL}${path}`, {
     method,
     headers: finalHeaders,
     body: body !== undefined ? JSON.stringify(body) : undefined,
     credentials: 'include',
     ...fetchOptions,
-  });
+    });
+
+  const response = await makeRequest();
 
   const isJson = response.headers.get('content-type')?.includes('application/json');
   const parsed = isJson ? await response.json() : null;
@@ -64,10 +67,25 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       (parsed && (parsed.message || parsed.error)) ||
       `${response.status} ${response.statusText}` ||
       'Request failed';
-    // If unauthorized, clear client token to force re-auth
-    if (response.status === 401 && typeof window !== 'undefined') {
+    // If unauthorized, try a single refresh then retry once.
+    if (response.status === 401 && typeof window !== 'undefined' && path !== '/api/auth/refresh') {
       try {
-        window.localStorage.removeItem('token');
+        const refreshRes = await fetch(`${BASE_URL}/api/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (refreshRes.ok) {
+          const retry = await makeRequest();
+          const retryIsJson = retry.headers.get('content-type')?.includes('application/json');
+          const retryParsed = retryIsJson ? await retry.json() : null;
+          if (retry.ok) return retryParsed as T;
+        }
+      } catch {
+        // fall through to logout below
+      }
+
+      try {
         window.localStorage.removeItem('user');
       } catch {
         // ignore storage errors

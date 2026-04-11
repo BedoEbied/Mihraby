@@ -29,11 +29,11 @@ export const authApi = {
    * Get current user
    */
   me: async (): Promise<UserWithoutPassword> => {
-    const response = await apiClient.get<ApiResponse<UserWithoutPassword>>('/api/auth/me');
+    const response = await apiClient.get<ApiResponse<{ user: UserWithoutPassword }>>('/api/auth/me');
     if (!response.success || !response.data) {
       throw new Error(response.error || 'Failed to fetch user');
     }
-    return response.data;
+    return response.data.user;
   },
 
   /**
@@ -42,7 +42,6 @@ export const authApi = {
   logout: async () => {
     await apiClient.post('/api/auth/logout');
     if (globalThis.window !== undefined) {
-      localStorage.removeItem('token');
       localStorage.removeItem('user');
       globalThis.window.location.href = '/login';
     }

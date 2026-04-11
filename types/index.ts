@@ -187,7 +187,6 @@ export interface LoginDTO {
 }
 
 export interface LoginResponse {
-  token: string;
   user: Omit<IUser, 'password'>;
 }
 

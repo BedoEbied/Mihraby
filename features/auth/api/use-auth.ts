@@ -24,7 +24,7 @@ export const useLogin = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      AuthClient.login(data.token, data.user);
+      AuthClient.login('', data.user);
       queryClient.setQueryData(authKeys.me(), data.user);
       addNotification({
         type: 'success',
@@ -56,7 +56,7 @@ export const useRegister = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      AuthClient.login(data.token, data.user);
+      AuthClient.login('', data.user);
       queryClient.setQueryData(authKeys.me(), data.user);
       addNotification({
         type: 'success',
@@ -100,7 +100,7 @@ export const useCurrentUser = () => {
   return useQuery({
     queryKey: authKeys.me(),
     queryFn: authApi.me,
-    enabled: !!AuthClient.getToken(),
+    enabled: true,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false,
   });

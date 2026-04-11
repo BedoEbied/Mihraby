@@ -4,8 +4,7 @@ import { UserRole } from '@/types';
 export const registerSchema = z.object({
   email: z.string().email('Please provide a valid email'),
   password: z.string().min(6, 'Password must be at least 6 characters long'),
-  name: z.string().min(1, 'Name is required'),
-  role: z.nativeEnum(UserRole).optional()
+  name: z.string().min(1, 'Name is required')
 });
 
 export const loginSchema = z.object({

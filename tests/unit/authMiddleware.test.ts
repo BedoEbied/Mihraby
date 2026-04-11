@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import type { NextRequest } from 'next/server';
 import { authenticate } from '@/lib/middleware/auth';
 
 vi.mock('@/lib/auth/server', () => ({
@@ -23,18 +24,18 @@ const makeRequest = (headers: Record<string, string>, cookies: Record<string, st
 describe('authenticate middleware', () => {
   it('uses cookie token when present', async () => {
     const req = makeRequest({}, { auth_token: 'cookie-token' });
-    const user = await authenticate(req as unknown as Request);
+    const user = await authenticate(req as unknown as NextRequest);
     expect(user.userId).toBe(1);
   });
 
   it('uses Authorization header token when cookie missing', async () => {
     const req = makeRequest({ authorization: 'Bearer header-token' });
-    const user = await authenticate(req as unknown as Request);
+    const user = await authenticate(req as unknown as NextRequest);
     expect(user.userId).toBe(1);
   });
 
   it('throws when missing token', async () => {
     const req = makeRequest({});
-    await expect(authenticate(req as unknown as Request)).rejects.toThrow('No token provided');
+    await expect(authenticate(req as unknown as NextRequest)).rejects.toThrow('No token provided');
   });
 });

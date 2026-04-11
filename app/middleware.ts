@@ -33,6 +33,7 @@ function checkRateLimit(key: string) {
 
 export function middleware(req: NextRequest) {
   const requestId = req.headers.get(REQUEST_ID_HEADER) ?? crypto.randomUUID();
+  const pathname = req.nextUrl.pathname;
 
   // Ensure CSRF token cookie exists for safe requests (for browsers)
   const res = NextResponse.next();
@@ -48,7 +49,7 @@ export function middleware(req: NextRequest) {
   }
 
   // Basic CSRF guard for mutating API calls: require same-origin for Origin/Referer
-  if (!SAFE_METHODS.has(req.method) && req.nextUrl.pathname.startsWith('/api')) {
+  if (!SAFE_METHODS.has(req.method) && pathname.startsWith('/api')) {
     const origin = req.headers.get('origin') || req.headers.get('referer');
     if (origin) {
       try {
@@ -93,10 +94,27 @@ export function middleware(req: NextRequest) {
     }
   }
 
+  // Page-level protection for dashboard routes (middleware runs on Edge runtime).
+  // We only gate on the presence of the session cookie here; role enforcement
+  // remains in server layouts/actions (Node runtime) where JWT verification is available.
+  if (
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/instructor') ||
+    pathname.startsWith('/student')
+  ) {
+    const hasToken = !!req.cookies.get('auth_token')?.value;
+    if (!hasToken) {
+      const url = req.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('next', pathname);
+      return NextResponse.redirect(url, { headers: { [REQUEST_ID_HEADER]: requestId } });
+    }
+  }
+
   res.headers.set(REQUEST_ID_HEADER, requestId);
   return res;
 }
 
 export const config = {
-  matcher: ['/api/:path*'],
+  matcher: ['/api/:path*', '/admin/:path*', '/instructor/:path*', '/student/:path*'],
 };
