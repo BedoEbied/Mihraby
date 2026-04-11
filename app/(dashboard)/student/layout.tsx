@@ -5,7 +5,7 @@ import { UserRole } from '@/types';
 import { LogoutButton } from '@/lib/components/logout-button';
 
 export const metadata = {
-  title: 'Student Dashboard | Tahbeer',
+  title: 'Student Dashboard | Mihraby',
   description: 'Browse and manage your courses.',
 };
 
@@ -18,7 +18,7 @@ export default async function StudentLayout({ children }: { children: ReactNode 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold">Tahbeer Student</h1>
+              <h1 className="text-xl font-bold">Mihraby Student</h1>
               <div className="ml-6 flex gap-4 text-sm text-gray-600">
                 <Link href="/student/courses" className="hover:text-gray-900">
                   Courses

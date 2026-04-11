@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tahbeer - Course Management Platform",
-  description: "Manage and enroll in courses with Tahbeer",
+  title: "Mihraby - Tutor Booking Platform",
+  description: "Book one-on-one tutoring sessions with expert instructors on Mihraby.",
 };
 
 export default function RootLayout({

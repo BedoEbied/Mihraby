@@ -1,6 +1,8 @@
-# Tahbeer - Course Management Platform
+# Mihraby - Tutor Booking Platform
 
-A comprehensive course management system built with TypeScript, Next.js, and Express. Supports role-based access control for Admins, Instructors, and Students.
+A tutor booking platform for Egypt. Instructors publish courses with time slots; students book and pay per session (Paymob + InstaPay); meetings are auto-created on Zoom.
+
+> Repo name is `Tahbeer` (historical). Product is **Mihraby**. The platform is a Next.js 16 monolith (no separate Express backend — ignore the "backend/frontend" structure described below, it's outdated and will be rewritten).
 
 ## 🚀 Features
 

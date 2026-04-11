@@ -7,7 +7,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-indigo-600">Tahbeer</h1>
+              <h1 className="text-2xl font-bold text-indigo-600">Mihraby</h1>
             </div>
             <div className="flex items-center space-x-4">
               <Link
@@ -31,10 +31,10 @@ export default function Home() {
         <div className="text-center">
           <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
             <span className="block">Welcome to</span>
-            <span className="block text-indigo-600">Tahbeer Learning Platform</span>
+            <span className="block text-indigo-600">Mihraby</span>
           </h1>
           <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Your comprehensive course management system. Create, manage, and enroll in courses with ease.
+            Book one-on-one tutoring sessions with expert instructors. Browse courses, pick a time that works for you, and learn live.
           </p>
           <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
             <div className="rounded-md shadow">

@@ -55,7 +55,7 @@ export default function LoginPage() {
     <div className="max-w-md w-full space-y-8 bg-white shadow rounded-lg p-8">
       <div>
         <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to Tahbeer
+          Sign in to Mihraby
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Or{' '}

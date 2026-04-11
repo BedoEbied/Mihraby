@@ -70,7 +70,7 @@ export default function RegisterPage() {
     <div className="max-w-md w-full space-y-8 bg-white shadow rounded-lg p-8">
       <div>
         <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
-          Create your Tahbeer account
+          Create your Mihraby account
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Or{' '}

@@ -33,11 +33,11 @@ export default function og() {
             letterSpacing: '0.02em',
           }}
         >
-          Tahbeer Courses
+          Mihraby
         </div>
-        <div style={{ fontWeight: 700 }}>Learn. Teach. Grow.</div>
+        <div style={{ fontWeight: 700 }}>Learn live. One session at a time.</div>
         <div style={{ fontSize: 28, color: '#1f2937', maxWidth: 700, lineHeight: 1.3 }}>
-          Explore courses, manage enrollments, and collaborate with instructors.
+          Book one-on-one sessions with expert tutors in Egypt.
         </div>
       </div>
     ),

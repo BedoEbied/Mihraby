@@ -5,7 +5,7 @@ import { UserRole } from '@/types';
 import { LogoutButton } from '@/lib/components/logout-button';
 
 export const metadata = {
-  title: 'Instructor Dashboard | Tahbeer',
+  title: 'Instructor Dashboard | Mihraby',
   description: 'Manage your courses and enrollments.',
 };
 
@@ -18,7 +18,7 @@ export default async function InstructorLayout({ children }: { children: ReactNo
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold">Tahbeer Instructor</h1>
+              <h1 className="text-xl font-bold">Mihraby Instructor</h1>
               <div className="ml-6 flex gap-4 text-sm text-gray-600">
                 <Link href="/instructor/courses" className="hover:text-gray-900">
                   My Courses

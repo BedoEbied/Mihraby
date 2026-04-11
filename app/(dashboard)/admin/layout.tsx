@@ -5,7 +5,7 @@ import { UserRole } from '@/types';
 import { LogoutButton } from '@/lib/components/logout-button';
 
 export const metadata = {
-  title: 'Admin Dashboard | Tahbeer',
+  title: 'Admin Dashboard | Mihraby',
   description: 'Manage users and courses as an administrator.',
 };
 
@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold">Tahbeer Admin</h1>
+              <h1 className="text-xl font-bold">Mihraby Admin</h1>
               <div className="ml-6 flex gap-4 text-sm text-gray-600">
                 <Link href="/admin/users" className="hover:text-gray-900">
                   Users

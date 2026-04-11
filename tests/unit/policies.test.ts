@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { POLICIES } from '@/lib/authorization/policies';
-import type { IUser, ICourse } from '@/types';
+import { UserRole, type IUser, type ICourse } from '@/types';
 
-const admin: Pick<IUser, 'id' | 'role'> = { id: 1, role: 'admin' } as const;
-const instructor: Pick<IUser, 'id' | 'role'> = { id: 2, role: 'instructor' } as const;
-const student: Pick<IUser, 'id' | 'role'> = { id: 3, role: 'student' } as const;
+const admin: Pick<IUser, 'id' | 'role'> = { id: 1, role: UserRole.ADMIN };
+const instructor: Pick<IUser, 'id' | 'role'> = { id: 2, role: UserRole.INSTRUCTOR };
+const student: Pick<IUser, 'id' | 'role'> = { id: 3, role: UserRole.STUDENT };
 const course: ICourse = {
   id: 10,
   title: 'Test',
@@ -13,6 +13,11 @@ const course: ICourse = {
   price: 0,
   image_url: null,
   status: 'draft',
+  slot_duration: 60,
+  price_per_slot: 0,
+  meeting_platform: 'manual',
+  meeting_link: null,
+  currency: 'EGP',
   created_at: new Date(),
 };
 

@@ -1,4 +1,3 @@
-export { default as BookingCart } from './booking-cart';
-export { default as MyBookings } from './my-bookings';
-export { default as InstructorBookings } from './instructor-bookings';
-export { default as AdminBookings } from './admin-bookings';
+// Booking components are added in Phase 2 (BookingCard, SlotPicker,
+// PaymentMethodSelector) and Phase 4 (AdminReviewCard). Empty barrel for now.
+export {};

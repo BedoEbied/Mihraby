@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Auth | Tahbeer',
-  description: 'Access your Tahbeer account.',
+  title: 'Auth | Mihraby',
+  description: 'Access your Mihraby account.',
 };
 
 export default function AuthLayout({ children }: { children: ReactNode }) {

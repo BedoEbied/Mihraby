@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 
 export const metadata = {
-  title: 'Dashboard | Tahbeer',
-  description: 'Manage courses, users, and enrollments in Tahbeer.',
+  title: 'Dashboard | Mihraby',
+  description: 'Manage courses, bookings, and time slots on Mihraby.',
 };
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

@@ -7,7 +7,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
-import { IBooking, CreateBookingDTO } from '@/lib/types';
+import { IBooking, InitiateBookingDTO } from '@/lib/types';
 import { useNotifications } from '@/lib/stores/notifications';
 
 const BOOKINGS_QUERY_KEYS = {
@@ -81,7 +81,7 @@ export function useInitiateBooking() {
   const { addNotification } = useNotifications();
 
   return useMutation({
-    mutationFn: async (data: CreateBookingDTO) => {
+    mutationFn: async (data: InitiateBookingDTO) => {
       return await apiClient.post<IBooking>('/api/bookings/initiate', data);
     },
     onSuccess: (data) => {

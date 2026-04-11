@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Unauthorized | Tahbeer',
+  title: 'Unauthorized | Mihraby',
   description: 'You do not have permission to access this page.',
 };
 

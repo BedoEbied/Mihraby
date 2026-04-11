@@ -33,7 +33,7 @@ export class Course {
   static async findAll(): Promise<CourseWithInstructor[]> {
     try {
       const [rows] = await pool.query<RowDataPacket[]>(`
-        SELECT 
+        SELECT
           c.*,
           u.name as instructor_name,
           u.email as instructor_email
@@ -42,19 +42,7 @@ export class Course {
         ORDER BY c.created_at DESC
       `);
 
-    return rows.map(row => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      price: row.price,
-      image_url: row.image_url,
-      status: row.status,
-      created_at: row.created_at,
-      instructor: {
-        name: row.instructor_name,
-        email: row.instructor_email
-      }
-    })) as unknown as CourseWithInstructor[];
+      return rows.map(Course.mapRowToCourseWithInstructor);
     } catch (error) {
       console.error('Error fetching all courses:', error);
       throw error;
@@ -67,7 +55,7 @@ export class Course {
   static async findPublished(): Promise<CourseWithInstructor[]> {
     try {
       const [rows] = await pool.query<RowDataPacket[]>(`
-        SELECT 
+        SELECT
           c.*,
           u.name as instructor_name,
           u.email as instructor_email
@@ -77,11 +65,33 @@ export class Course {
         ORDER BY c.created_at DESC
       `);
 
-      return rows as CourseWithInstructor[];
+      return rows.map(Course.mapRowToCourseWithInstructor);
     } catch (error) {
       console.error('Error fetching published courses:', error);
       throw error;
     }
+  }
+
+  private static mapRowToCourseWithInstructor(row: RowDataPacket): CourseWithInstructor {
+    return {
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      instructor_id: row.instructor_id,
+      price: Number(row.price),
+      image_url: row.image_url,
+      status: row.status,
+      slot_duration: row.slot_duration,
+      price_per_slot: Number(row.price_per_slot),
+      meeting_platform: row.meeting_platform,
+      meeting_link: row.meeting_link,
+      currency: row.currency,
+      created_at: row.created_at,
+      instructor: {
+        name: row.instructor_name,
+        email: row.instructor_email
+      }
+    };
   }
 
   /**
@@ -106,11 +116,37 @@ export class Course {
    */
   static async create(courseData: CreateCourseDTO, instructorId: number): Promise<ICourse> {
     try {
-      const { title, description, price, image_url, status = 'draft' } = courseData;
+      const {
+        title,
+        description,
+        price,
+        image_url,
+        status = 'draft',
+        slot_duration = 60,
+        price_per_slot = 0,
+        meeting_platform = 'manual',
+        meeting_link,
+        currency = 'EGP',
+      } = courseData;
 
       const [result] = await pool.query<ResultSetHeader>(
-        'INSERT INTO courses (title, description, instructor_id, price, image_url, status) VALUES (?, ?, ?, ?, ?, ?)',
-        [title, description || null, instructorId, price, image_url || null, status]
+        `INSERT INTO courses
+          (title, description, instructor_id, price, image_url, status,
+           slot_duration, price_per_slot, meeting_platform, meeting_link, currency)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          title,
+          description || null,
+          instructorId,
+          price,
+          image_url || null,
+          status,
+          slot_duration,
+          price_per_slot,
+          meeting_platform,
+          meeting_link || null,
+          currency,
+        ]
       );
 
       const newCourse = await this.findById(result.insertId);
@@ -153,6 +189,26 @@ export class Course {
       if (updateData.status !== undefined) {
         fields.push('status = ?');
         values.push(updateData.status);
+      }
+      if (updateData.slot_duration !== undefined) {
+        fields.push('slot_duration = ?');
+        values.push(updateData.slot_duration);
+      }
+      if (updateData.price_per_slot !== undefined) {
+        fields.push('price_per_slot = ?');
+        values.push(updateData.price_per_slot);
+      }
+      if (updateData.meeting_platform !== undefined) {
+        fields.push('meeting_platform = ?');
+        values.push(updateData.meeting_platform);
+      }
+      if (updateData.meeting_link !== undefined) {
+        fields.push('meeting_link = ?');
+        values.push(updateData.meeting_link);
+      }
+      if (updateData.currency !== undefined) {
+        fields.push('currency = ?');
+        values.push(updateData.currency);
       }
 
       if (fields.length === 0) {
