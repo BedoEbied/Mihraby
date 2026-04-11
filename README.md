@@ -1,271 +1,145 @@
-# Mihraby - Tutor Booking Platform
+# Mihraby — Tutor Booking Platform
 
-A tutor booking platform for Egypt. Instructors publish courses with time slots; students book and pay per session (Paymob + InstaPay); meetings are auto-created on Zoom.
+A one-on-one tutor booking platform for Egypt. Instructors publish courses with
+time slots; students book and pay per session (Paymob card/wallet/Fawry or
+InstaPay with manual review); meetings are auto-created on Zoom.
 
-> Repo name is `Tahbeer` (historical). Product is **Mihraby**. The platform is a Next.js 16 monolith (no separate Express backend — ignore the "backend/frontend" structure described below, it's outdated and will be rewritten).
+> The GitHub repo is still named **Tahbeer** for historical reasons. The
+> product is **Mihraby**. The codebase is a **single Next.js 16 App Router
+> monolith** — there is no separate Express backend.
 
-## 🚀 Features
+## Tech stack
 
-- **🔐 Authentication & Authorization**
-  - JWT-based authentication
-  - Role-based access control (Admin, Instructor, Student)
-  - Secure password hashing with bcrypt
-  
-- **👥 Three User Roles**
-  - **Students**: Browse and enroll in courses
-  - **Instructors**: Create and manage courses, view enrollments
-  - **Admins**: Manage users, courses, and platform settings
+- **Next.js 16** (App Router, React 19, Turbopack)
+- **TypeScript 5** everywhere
+- **MySQL 8** via `mysql2/promise` at runtime, **Knex** for migrations only
+- **Zustand** + **TanStack Query v5** for client state
+- **Tailwind CSS 4**
+- **Zod** for input validation, **bcryptjs** + **jsonwebtoken** for auth
+- **Vitest 2** (unit/integration, jsdom, MSW) + **Playwright** (E2E)
 
-- **📚 Course Management**
-  - Create, update, and delete courses
-  - Course enrollment system
-  - Track student progress
-
-- **💻 Modern Tech Stack**
-  - Full TypeScript implementation
-  - Next.js 15 with App Router
-  - Express.js backend
-  - MySQL database
-  - Tailwind CSS for styling
-
-## 📁 Project Structure
-
-```
-Tahbeer/
-├── backend/                  # Express TypeScript API
-│   ├── src/
-│   │   ├── config/          # Database configuration
-│   │   ├── controllers/     # Request handlers
-│   │   ├── middleware/      # Auth & role check middleware
-│   │   ├── models/          # Database models
-│   │   ├── routes/          # API routes
-│   │   ├── types/           # TypeScript interfaces
-│   │   ├── utils/           # Helper functions
-│   │   └── server.ts        # Main server file
-│   ├── migrations/          # Database migrations (TypeScript)
-│   ├── tsconfig.json
-│   └── package.json
-│
-└── frontend/                # Next.js TypeScript frontend
-    ├── app/                 # Next.js app directory
-    │   ├── admin/          # Admin dashboard
-    │   ├── instructor/     # Instructor dashboard
-    │   ├── student/        # Student dashboard
-    │   ├── login/          # Login page
-    │   └── register/       # Registration page
-    ├── lib/
-    │   ├── api/            # API client & functions
-    │   └── context/        # React contexts (Auth)
-    ├── types/              # Shared TypeScript types
-    └── package.json
-
-```
-
-## 🛠️ Setup Instructions
+## Quick start
 
 ### Prerequisites
 
-- Node.js 18+ and Yarn
-- MySQL 8.0+
+- Node.js 20+ and Yarn
+- MySQL 8.0+ running locally (or reachable)
 
-### Backend Setup
+### Setup
 
-1. **Navigate to backend directory**
-   ```bash
-   cd backend
-   ```
+```bash
+# 1. Install
+yarn install
 
-2. **Install dependencies**
-   ```bash
-   yarn install
-   ```
+# 2. Create .env from .env.example and fill in:
+#    DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, JWT_SECRET
+cp .env.example .env
 
-3. **Configure environment variables**
-   Create a `.env` file in the backend directory:
-   ```env
-   PORT=5000
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=your_password
-   DB_NAME=courses_db
-   JWT_SECRET=your_strong_secret_key_change_this
-   NODE_ENV=development
-   ```
+# 3. Create the database
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS mihraby;"
 
-4. **Create database**
-   ```bash
-   mysql -u root -p
-   CREATE DATABASE courses_db;
-   EXIT;
-   ```
+# 4. Run migrations (Knex CLI)
+npx knex --knexfile knexfile.ts migrate:latest
 
-5. **Run migrations (Knex)**
-   ```bash
-   yarn migrate:up
-   ```
+# 5. Seed dev data
+yarn db:seed
 
-6. **Start development server**
-   ```bash
-   yarn dev
-   ```
-   Backend will run on `http://localhost:5000`
-
-### Frontend Setup
-
-1. **Navigate to frontend directory**
-   ```bash
-   cd frontend
-   ```
-
-2. **Install dependencies**
-   ```bash
-   yarn install
-   ```
-
-3. **Configure environment variables**
-   Create a `.env.local` file:
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:5000
-   ```
-
-4. **Start development server**
-   ```bash
-   yarn dev
-   ```
-   Frontend will run on `http://localhost:3000`
-
-## 📝 API Endpoints
-
-### Authentication Routes (`/api/auth`)
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user (protected)
-
-### Student Routes (`/api/student`)
-- `GET /api/student/courses` - Browse all published courses
-- `POST /api/student/enroll/:courseId` - Enroll in a course
-- `GET /api/student/my-courses` - Get enrolled courses
-
-### Instructor Routes (`/api/instructor`)
-- `GET /api/instructor/courses` - Get instructor's courses
-- `POST /api/instructor/courses` - Create new course
-- `PUT /api/instructor/courses/:id` - Update course
-- `DELETE /api/instructor/courses/:id` - Delete course
-- `GET /api/instructor/courses/:id/enrollments` - View course enrollments
-
-### Admin Routes (`/api/admin`)
-- `GET /api/admin/users` - Get all users
-- `PUT /api/admin/users/:id/role` - Update user role
-- `DELETE /api/admin/users/:id` - Delete user
-- `GET /api/admin/courses` - Get all courses
-
-## 🗄️ Database Schema
-
-### Users Table
-```sql
-- id (INT, PRIMARY KEY, AUTO_INCREMENT)
-- email (VARCHAR, UNIQUE)
-- password (VARCHAR, HASHED)
-- name (VARCHAR)
-- role (ENUM: 'admin', 'student', 'instructor')
-- created_at (TIMESTAMP)
+# 6. Start the dev server
+yarn dev
 ```
 
-### Courses Table
-```sql
-- id (INT, PRIMARY KEY, AUTO_INCREMENT)
-- title (VARCHAR)
-- description (TEXT)
-- instructor_id (INT, FOREIGN KEY -> users.id)
-- price (DECIMAL)
-- image_url (VARCHAR)
-- status (ENUM: 'draft', 'published', 'archived')
-- created_at (TIMESTAMP)
+The app runs on `http://localhost:3000`. There is no separate API port —
+routes live under `app/api/**` in the same Next.js process.
+
+**Phase-specific env vars** (added as features land — see `docs/ROADMAP.md`):
+`APP_ENCRYPTION_KEY` (Phase 0, 32-byte base64 for AES-256-GCM token
+encryption), `PAYMOB_*` (Phase 3), `UPLOADS_DIR` (Phase 4), `ZOOM_*`
+(Phase 5), `CRON_SECRET` (Phase 6).
+
+Generate `APP_ENCRYPTION_KEY`:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
-### Enrollments Table
-```sql
-- id (INT, PRIMARY KEY, AUTO_INCREMENT)
-- user_id (INT, FOREIGN KEY -> users.id)
-- course_id (INT, FOREIGN KEY -> courses.id)
-- enrolled_at (TIMESTAMP)
+## Commands
+
+```bash
+# Dev server (Next.js 16 + Turbopack)
+yarn dev
+
+# Production build + start
+yarn build
+yarn start
+
+# Lint (ESLint 9 flat config)
+yarn lint
+
+# Typecheck (no yarn script; run directly)
+npx tsc --noEmit
+
+# Unit + integration tests (Vitest)
+yarn test                       # run once
+yarn test:ui                    # watch UI
+npx vitest run path/to.test.ts  # single file
+npx vitest run -t "pattern"     # single test by name
+
+# End-to-end tests (Playwright)
+yarn test:e2e
+
+# Database migrations (Knex)
+npx knex --knexfile knexfile.ts migrate:latest
+npx knex --knexfile knexfile.ts migrate:rollback
+npx knex --knexfile knexfile.ts migrate:make <name> -x ts
+
+# Seed
+yarn db:seed
 ```
 
-## 🔧 Available Scripts
+## Docs
 
-### Backend
-- `yarn dev` - Start development server with hot reload
-- `yarn build` - Compile TypeScript to JavaScript
-- `yarn start` - Run production server
-- `yarn migrate:up` - Run database migrations
-- `yarn migrate:down` - Rollback migrations
-- `yarn migrate:create <name>` - Create new Knex migration (uses `backend/migrations/template.ts` stub)
+- **[`docs/ROADMAP.md`](docs/ROADMAP.md)** — canonical 7-phase MVP plan
+  (Phase 0 foundations through Phase 6 staging deploy). Start here if you
+  want to know what we're building next.
+- **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)** — layered structure,
+  composition root, slot-locking, webhook idempotency, encrypted tokens,
+  testing layers. Start here if you want to understand the code.
+- **[`docs/TECHNICAL_REQUIREMENTS.md`](docs/TECHNICAL_REQUIREMENTS.md)** —
+  long-form background requirements (epics, user stories). Useful context,
+  but `ROADMAP.md` is the source of truth for scope.
+- **[`docs/PHASE2_FOUNDATION.md`](docs/PHASE2_FOUNDATION.md)** — historical
+  notes on the Phase 2 foundation work (time slots/bookings schema, types,
+  validators) that shipped on `develop`. Phase 0 of `ROADMAP.md` builds on it.
+- **[`CLAUDE.md`](CLAUDE.md)** — day-to-day working conventions for AI
+  assistants (and humans) contributing to this repo.
 
-### Frontend
-- `yarn dev` - Start Next.js development server
-- `yarn build` - Build for production
-- `yarn start` - Run production build
-- `yarn lint` - Run ESLint
+## User roles
 
-## 🔐 Authentication Flow
+| Role | What they do |
+|---|---|
+| **Student** | Browse courses, pick an available time slot, pay, join Zoom meeting |
+| **Instructor** | Create courses, manage time slots, connect Zoom, view/cancel bookings |
+| **Admin** | Review InstaPay proofs, approve/reject pending bookings |
 
-1. User registers/logs in → Receives JWT token
-2. Token stored in localStorage
-3. Token sent in `Authorization: Bearer <token>` header
-4. Backend middleware verifies token
-5. Role-based middleware checks permissions
-6. Access granted/denied based on role
+## Payments
 
-## 👤 User Roles & Permissions
+- **Paymob** hosted checkout — card, Vodafone Cash wallet, Fawry. Amounts
+  are stored in EGP; conversion to piasters (1 EGP = 100) is centralized in
+  `PaymobGateway`.
+- **InstaPay manual** — student uploads a payment screenshot, booking sits
+  in `pending_review` until an admin approves it. Both payment paths converge
+  on the same `BookingService.confirmBooking` code path.
 
-| Feature | Student | Instructor | Admin |
-|---------|---------|------------|-------|
-| Browse Courses | ✅ | ✅ | ✅ |
-| Enroll in Courses | ✅ | ❌ | ❌ |
-| Create Courses | ❌ | ✅ | ✅ |
-| Manage Own Courses | ❌ | ✅ | ✅ |
-| Manage All Courses | ❌ | ❌ | ✅ |
-| Manage Users | ❌ | ❌ | ✅ |
-| Change User Roles | ❌ | ❌ | ✅ |
+See `docs/ARCHITECTURE.md` §5 for webhook idempotency rules and
+`docs/ROADMAP.md` §6–7 for the full payment + admin review flow.
 
-## 🚧 MVP Status
+## Meetings
 
-This is an MVP (Minimum Viable Product) implementation. Current features:
+- **Zoom OAuth** — each instructor connects their own Zoom account. Tokens
+  are AES-256-GCM encrypted at-rest; refresh tokens are rotating and must be
+  refreshed inside a `SELECT ... FOR UPDATE` transaction. On meeting
+  creation failure, the booking is still `confirmed` and a retry cron
+  processes the `booking_meeting_retries` table.
 
-✅ User registration and authentication  
-✅ Role-based access control  
-✅ Basic course CRUD operations  
-✅ Enrollment system  
-✅ Responsive UI with Tailwind CSS  
-✅ Full TypeScript implementation  
+## License
 
-## 🎯 Future Enhancements
-
-- Course content management (videos, files, quizzes)
-- Student progress tracking
-- Payment integration
-- Email notifications
-- Course reviews and ratings
-- Search and filtering
-- User profile management
-- Course categories and tags
-- Dashboard analytics
-
-## 📄 License
-
-ISC
-
-## 👥 Contributing
-
-This is a learning project. Feel free to fork and experiment!
-
-## 🐛 Known Issues
-
-- Logout currently redirects client-side only
-- No email verification system
-- No password reset functionality
-- No file upload for course images (coming soon with multer)
-
----
-
-Built with ❤️ using TypeScript, Next.js, and Express
+ISC. Private project — not currently accepting external contributions.
