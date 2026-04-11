@@ -18,12 +18,15 @@ export async function createCourseAction(formData: FormData) {
   try {
     const user = await getCurrentUser();
 
+    const price = parseFloat(formData.get('price') as string);
     const data: CreateCourseDTO = {
       title: formData.get('title') as string,
       description: formData.get('description') as string | undefined,
-      price: parseFloat(formData.get('price') as string),
+      price,
       image_url: formData.get('image_url') as string | undefined,
       status: formData.get('status') as 'draft' | 'published' | undefined,
+      // Phase 2 fields (defaults kept server-side too)
+      price_per_slot: price,
     };
 
     const validatedData = createCourseSchema.parse(data);

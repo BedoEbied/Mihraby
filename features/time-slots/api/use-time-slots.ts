@@ -141,14 +141,15 @@ export function useCreateTimeSlotsBulk(courseId: number) {
 }
 
 /**
- * Update an existing slot.
+ * Update an existing slot. slotId is provided at mutate time so one hook
+ * instance can edit any slot from a list.
  */
-export function useUpdateTimeSlot(slotId: number) {
+export function useUpdateTimeSlot() {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
 
-  return useMutation<ITimeSlot, Error, UpdateTimeSlotDTO>({
-    mutationFn: async (data) => {
+  return useMutation<ITimeSlot, Error, UpdateTimeSlotDTO & { slotId: number }>({
+    mutationFn: async ({ slotId, ...data }) => {
       const response = await apiClient.put<ApiResponse<ITimeSlot>>(
         `/api/instructor/slots/${slotId}`,
         data
@@ -174,14 +175,15 @@ export function useUpdateTimeSlot(slotId: number) {
 }
 
 /**
- * Delete a slot.
+ * Delete a slot. slotId is provided at mutate time so one hook instance
+ * can delete any slot from a list.
  */
-export function useDeleteTimeSlot(slotId: number) {
+export function useDeleteTimeSlot() {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
 
-  return useMutation<void, Error, void>({
-    mutationFn: async () => {
+  return useMutation<void, Error, number>({
+    mutationFn: async (slotId) => {
       const response = await apiClient.delete<ApiResponse>(
         `/api/instructor/slots/${slotId}`
       );

@@ -557,7 +557,7 @@ SMTP_FROM=noreply@mihraby.com
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=password
-DB_NAME=tahbeer
+DB_NAME=mihraby_db
 ```
 
 ---

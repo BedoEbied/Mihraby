@@ -110,6 +110,37 @@ export const useUpdateCourse = (courseId: number) => {
   });
 };
 
+// Enroll in course (student)
+export const useEnrollInCourse = () => {
+  const queryClient = useQueryClient();
+  const { addNotification } = useNotifications();
+
+  return useMutation<void, Error, number>({
+    mutationFn: async (courseId) => {
+      const response = await courseApi.enrollInCourse(courseId);
+      if (!response.success) {
+        throw new Error(response.error ?? 'Failed to enroll');
+      }
+    },
+    onSuccess: (_, courseId) => {
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(courseId) });
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
+      addNotification({
+        type: 'success',
+        title: 'Enrolled',
+        message: 'You have been enrolled in the course.',
+      });
+    },
+    onError: (error) => {
+      addNotification({
+        type: 'error',
+        title: 'Enrollment failed',
+        message: error.message,
+      });
+    },
+  });
+};
+
 // Delete course
 export const useDeleteCourse = () => {
   const queryClient = useQueryClient();

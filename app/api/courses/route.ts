@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Course } from '@/lib/db/models/Course';
 import { withAuth } from '@/lib/middleware/auth';
 import { createCourseSchema, getAllCoursesQuerySchema } from '@/lib/validators/course';
 import { ApiResponse, UserRole, CourseWithInstructor, ICourse, JwtPayload } from '@/types';
 import { ApiError, ApiErrorCode, handleApiError } from '@/lib/api/errors';
+import { CourseService } from '@/lib/services/courseService';
 
 /**
  * GET /api/courses - Get all courses with optional filtering and pagination
@@ -21,13 +21,9 @@ export async function GET(req: NextRequest) {
     // Validate query parameters
     const validatedQuery = getAllCoursesQuerySchema.parse(queryParams);
     
-    let courses: CourseWithInstructor[];
-    
-    if (validatedQuery.status === 'published') {
-      courses = await Course.findPublished();
-    } else {
-      courses = await Course.findAll();
-    }
+    const courses: CourseWithInstructor[] = await CourseService.getAllCourses(
+      validatedQuery.status === 'published' ? 'published' : undefined
+    );
 
     // Apply pagination
     const page = validatedQuery.page || 1;
@@ -66,7 +62,7 @@ async function createCourseHandler(req: NextRequest, context: { user: JwtPayload
     const validatedData = createCourseSchema.parse(body);
     const instructorId = context.user.userId;
 
-    const course = await Course.create(validatedData, instructorId);
+    const course = await CourseService.createCourse(instructorId, validatedData);
 
     return NextResponse.json<ApiResponse<ICourse>>(
       {

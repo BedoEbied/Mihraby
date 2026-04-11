@@ -1,6 +1,6 @@
 import { Enrollment } from '@/lib/db/models/Enrollment';
 import { Course } from '@/lib/db/models/Course';
-import { IEnrollment, EnrollmentWithDetails } from '@/types';
+import { IEnrollment, EnrollmentWithDetails, UserRole } from '@/types';
 
 /**
  * Enrollment Service - Pure business logic
@@ -37,7 +37,7 @@ export class EnrollmentService {
    */
   static async getCourseEnrollments(
     userId: number,
-    userRole: string,
+    userRole: UserRole,
     courseId: number
   ): Promise<EnrollmentWithDetails[]> {
     // Check if course exists
@@ -47,7 +47,7 @@ export class EnrollmentService {
     }
 
     // Authorization check
-    if (course.instructor_id !== userId && userRole !== 'admin') {
+    if (course.instructor_id !== userId && userRole !== UserRole.ADMIN) {
       throw new Error('You can only view enrollments for your own courses');
     }
 

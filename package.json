@@ -10,7 +10,10 @@
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
-    "db:seed": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"CommonJS\",\"moduleResolution\":\"node\"}' ts-node -r dotenv/config ./scripts/seed.ts"
+    "db:seed": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"CommonJS\",\"moduleResolution\":\"node\"}' ts-node -r dotenv/config ./scripts/seed.ts",
+    "migrate:up": "knex migrate:latest",
+    "migrate:down": "knex migrate:rollback",
+    "migrate:create": "knex migrate:make"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.12",
