@@ -26,16 +26,31 @@ let fileStorage: FileStorage | null = null;
 /**
  * Returns the active payment gateway for the current environment.
  *
- * Wired in Phase 3 once PaymobGateway is implemented. Until then, throws a
- * clear error so any accidental usage fails loud.
+ * When PAYMOB_API_KEY is set, uses the live PaymobGateway.
+ * Otherwise falls back to MockPaymentGateway for local development.
  */
 export function getPaymentGateway(): PaymentGateway {
   if (!paymentGateway) {
-    throw new Error(
-      'PaymentGateway is not wired yet. Implement PaymobGateway (Phase 3) and register it in lib/composition.ts.'
-    );
+    if (process.env.PAYMOB_API_KEY) {
+      const { PaymobGateway } = require('@/lib/services/payments/PaymobGateway');
+      paymentGateway = new PaymobGateway({
+        apiKey: process.env.PAYMOB_API_KEY,
+        integrationIds: {
+          card: process.env.PAYMOB_INTEGRATION_ID_CARD!,
+          wallet: process.env.PAYMOB_INTEGRATION_ID_WALLET!,
+          fawry: process.env.PAYMOB_INTEGRATION_ID_FAWRY!,
+        },
+        iframeId: process.env.PAYMOB_IFRAME_ID!,
+        hmacSecret: process.env.PAYMOB_HMAC_SECRET!,
+      });
+      console.log('[composition] PaymentGateway: PaymobGateway (live)');
+    } else {
+      const { MockPaymentGateway } = require('@/lib/services/payments/MockPaymentGateway');
+      paymentGateway = new MockPaymentGateway();
+      console.log('[composition] PaymentGateway: MockPaymentGateway (dev)');
+    }
   }
-  return paymentGateway;
+  return paymentGateway!;
 }
 
 /** Test / phased-rollout hook. Prefer configuration over direct calls. */
