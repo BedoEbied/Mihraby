@@ -1,3 +1,2 @@
-// Booking components are added in Phase 2 (BookingCard, SlotPicker,
-// PaymentMethodSelector) and Phase 4 (AdminReviewCard). Empty barrel for now.
-export {};
+export { default as MyBookings } from './my-bookings';
+export { default as BookingCart } from './booking-cart';

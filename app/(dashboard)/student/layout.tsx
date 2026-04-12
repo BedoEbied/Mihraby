@@ -26,6 +26,9 @@ export default async function StudentLayout({ children }: { children: ReactNode 
                 <Link href="/student/my-courses" className="hover:text-gray-900">
                   My Courses
                 </Link>
+                <Link href="/student/bookings" className="hover:text-gray-900">
+                  My Bookings
+                </Link>
               </div>
             </div>
             <div className="flex items-center gap-4">
