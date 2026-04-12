@@ -9,6 +9,7 @@ import type {
   BookingStatus,
   PaymentMethod,
   UserRole,
+  InitiateBookingDTO,
 } from '@/types';
 import { UserRole as Roles } from '@/types';
 
@@ -39,9 +40,10 @@ export class BookingService {
    */
   static async initiateBooking(
     userId: number,
-    slotId: number,
-    paymentMethod: PaymentMethod
+    dto: InitiateBookingDTO
   ): Promise<IBooking> {
+    const { slot_id: slotId, payment_method: paymentMethod } = dto;
+
     // -- Pre-flight (cheap reads on the pool, no lock) --
     const slot = await TimeSlot.findById(slotId);
     if (!slot) {

@@ -145,7 +145,7 @@ describe('BookingService', () => {
       vi.mocked(Booking.create).mockResolvedValue(booking);
       vi.mocked(TimeSlot.markHeld).mockResolvedValue(true);
 
-      const result = await BookingService.initiateBooking(1, 1, 'paymob_card');
+      const result = await BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'paymob_card' });
 
       expect(result).toEqual(booking);
       expect(Booking.create).toHaveBeenCalledWith(mockConn, {
@@ -170,7 +170,7 @@ describe('BookingService', () => {
       vi.mocked(Booking.create).mockResolvedValue(booking);
       vi.mocked(TimeSlot.markHeld).mockResolvedValue(true);
 
-      const result = await BookingService.initiateBooking(1, 1, 'instapay');
+      const result = await BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'instapay' });
 
       expect(result.status).toBe('pending_review');
       expect(Booking.create).toHaveBeenCalledWith(
@@ -183,7 +183,7 @@ describe('BookingService', () => {
       vi.mocked(TimeSlot.findById).mockResolvedValue(null);
 
       await expect(
-        BookingService.initiateBooking(1, 999, 'paymob_card')
+        BookingService.initiateBooking(1, { slot_id: 999, payment_method: 'paymob_card' })
       ).rejects.toThrow('Time slot not found');
     });
 
@@ -191,7 +191,7 @@ describe('BookingService', () => {
       vi.mocked(TimeSlot.findById).mockResolvedValue(makeSlot({ is_available: false }));
 
       await expect(
-        BookingService.initiateBooking(1, 1, 'paymob_card')
+        BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'paymob_card' })
       ).rejects.toThrow('no longer available');
     });
 
@@ -199,7 +199,7 @@ describe('BookingService', () => {
       vi.mocked(TimeSlot.findById).mockResolvedValue(makeSlot({ start_time: PAST }));
 
       await expect(
-        BookingService.initiateBooking(1, 1, 'paymob_card')
+        BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'paymob_card' })
       ).rejects.toThrow('past');
     });
 
@@ -208,7 +208,7 @@ describe('BookingService', () => {
       vi.mocked(Course.findById).mockResolvedValue(null);
 
       await expect(
-        BookingService.initiateBooking(1, 1, 'paymob_card')
+        BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'paymob_card' })
       ).rejects.toThrow('Course not found');
     });
 
@@ -217,7 +217,7 @@ describe('BookingService', () => {
       vi.mocked(Course.findById).mockResolvedValue(makeCourse({ status: 'draft' }));
 
       await expect(
-        BookingService.initiateBooking(1, 1, 'paymob_card')
+        BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'paymob_card' })
       ).rejects.toThrow('not published');
     });
 
@@ -229,7 +229,7 @@ describe('BookingService', () => {
       );
 
       await expect(
-        BookingService.initiateBooking(1, 1, 'paymob_card')
+        BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'paymob_card' })
       ).rejects.toThrow('no longer available');
     });
 
@@ -242,7 +242,7 @@ describe('BookingService', () => {
       vi.mocked(Booking.create).mockRejectedValue(dupError);
 
       await expect(
-        BookingService.initiateBooking(1, 1, 'paymob_card')
+        BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'paymob_card' })
       ).rejects.toThrow('already been booked');
     });
 
@@ -255,7 +255,7 @@ describe('BookingService', () => {
       vi.mocked(Booking.create).mockRejectedValue(genericError);
 
       await expect(
-        BookingService.initiateBooking(1, 1, 'paymob_card')
+        BookingService.initiateBooking(1, { slot_id: 1, payment_method: 'paymob_card' })
       ).rejects.toThrow('Connection lost');
     });
   });
