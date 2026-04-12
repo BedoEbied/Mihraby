@@ -7,8 +7,22 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
-import { IBooking, InitiateBookingDTO } from '@/lib/types';
+import type {
+  IBooking,
+  BookingWithDetails,
+  InitiateBookingDTO,
+  ApiResponse,
+} from '@/lib/types';
 import { useNotifications } from '@/lib/stores/notifications';
+
+type BookingListPayload = { bookings: BookingWithDetails[]; count: number };
+
+function unwrap<T>(response: ApiResponse<T>): T {
+  if (!response.success || response.data === undefined || response.data === null) {
+    throw new Error(response.error || response.message || 'Request failed');
+  }
+  return response.data;
+}
 
 const BOOKINGS_QUERY_KEYS = {
   all: ['bookings'] as const,
@@ -18,46 +32,48 @@ const BOOKINGS_QUERY_KEYS = {
   detail: (id: number) => ['bookings', id] as const,
 };
 
+export { BOOKINGS_QUERY_KEYS };
+
 /**
- * Hook to get current user's bookings
+ * Student's own bookings.
  */
 export function useMyBookings(status?: 'upcoming' | 'past' | 'all') {
   return useQuery({
     queryKey: [...BOOKINGS_QUERY_KEYS.student, status || 'all'],
     queryFn: async () => {
-      const params = status ? `?status=${status}` : '';
-      const response = await apiClient.get<IBooking[]>(`/api/student/bookings${params}`);
-      return response;
+      const params = status && status !== 'all' ? `?status=${status}` : '';
+      const response = await apiClient.get<ApiResponse<BookingListPayload>>(
+        `/api/student/bookings${params}`
+      );
+      return unwrap(response).bookings;
     },
   });
 }
 
 /**
- * Hook to get instructor's upcoming bookings
+ * Instructor's bookings across all their courses.
  */
 export function useInstructorBookings() {
   return useQuery({
     queryKey: BOOKINGS_QUERY_KEYS.instructor,
     queryFn: async () => {
-      const response = await apiClient.get<IBooking[]>('/api/instructor/bookings');
-      return response;
+      const response = await apiClient.get<ApiResponse<BookingListPayload>>(
+        '/api/instructor/bookings'
+      );
+      return unwrap(response).bookings;
     },
   });
 }
 
 /**
- * Hook to get all bookings (admin only)
+ * Admin bookings list with filters.
  */
 export function useAdminBookings(filters?: {
-  user_id?: number;
-  course_id?: number;
   status?: string;
   page?: number;
   limit?: number;
 }) {
   const queryParams = new URLSearchParams();
-  if (filters?.user_id) queryParams.append('user_id', filters.user_id.toString());
-  if (filters?.course_id) queryParams.append('course_id', filters.course_id.toString());
   if (filters?.status) queryParams.append('status', filters.status);
   if (filters?.page) queryParams.append('page', filters.page.toString());
   if (filters?.limit) queryParams.append('limit', filters.limit.toString());
@@ -65,62 +81,90 @@ export function useAdminBookings(filters?: {
   return useQuery({
     queryKey: [...BOOKINGS_QUERY_KEYS.admin, filters],
     queryFn: async () => {
-      const response = await apiClient.get<IBooking[]>(
+      const response = await apiClient.get<ApiResponse<BookingListPayload>>(
         `/api/admin/bookings?${queryParams.toString()}`
       );
-      return response;
+      return unwrap(response).bookings;
     },
   });
 }
 
 /**
- * Hook to initiate a new booking
+ * Fetch a single booking by ID.
+ */
+export function useBookingDetail(bookingId: number) {
+  return useQuery({
+    queryKey: BOOKINGS_QUERY_KEYS.detail(bookingId),
+    enabled: Number.isFinite(bookingId) && bookingId > 0,
+    queryFn: async () => {
+      const response = await apiClient.get<ApiResponse<IBooking>>(
+        `/api/bookings/${bookingId}`
+      );
+      return unwrap(response);
+    },
+  });
+}
+
+/**
+ * Initiate a new booking (hold a slot).
  */
 export function useInitiateBooking() {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
 
-  return useMutation({
-    mutationFn: async (data: InitiateBookingDTO) => {
-      return await apiClient.post<IBooking>('/api/bookings/initiate', data);
+  return useMutation<IBooking, Error, InitiateBookingDTO>({
+    mutationFn: async (data) => {
+      const response = await apiClient.post<ApiResponse<IBooking>>(
+        '/api/bookings/initiate',
+        data
+      );
+      return unwrap(response);
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.student });
+      // Also invalidate available slots so the picker reflects the hold
+      queryClient.invalidateQueries({ queryKey: ['time-slots'] });
       addNotification({
         type: 'success',
-        title: 'Booking Created',
-        message: 'Please proceed to payment',
+        title: 'Slot Reserved',
+        message: 'Please complete your payment to confirm the booking',
       });
-      return data;
     },
     onError: (error) => {
       addNotification({
         type: 'error',
         title: 'Booking Failed',
-        message: error instanceof Error ? error.message : 'Unable to create booking',
+        message: error instanceof Error ? error.message : 'Unable to book this slot',
       });
     },
   });
 }
 
 /**
- * Hook to cancel a booking
+ * Cancel a pending booking.
  */
-export function useCancelBooking(bookingId: number) {
+export function useCancelBooking() {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
 
-  return useMutation({
-    mutationFn: async () => {
-      return await apiClient.put<IBooking>(`/api/bookings/${bookingId}/cancel`, {});
+  return useMutation<void, Error, number>({
+    mutationFn: async (bookingId) => {
+      const response = await apiClient.put<ApiResponse>(
+        `/api/bookings/${bookingId}/cancel`,
+        {}
+      );
+      if (!response.success) {
+        throw new Error(response.error || response.message || 'Failed to cancel');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.student });
       queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.instructor });
+      queryClient.invalidateQueries({ queryKey: ['time-slots'] });
       addNotification({
         type: 'success',
         title: 'Booking Cancelled',
-        message: 'Your booking has been cancelled',
+        message: 'Your booking has been cancelled and the slot released',
       });
     },
     onError: (error) => {
@@ -134,15 +178,21 @@ export function useCancelBooking(bookingId: number) {
 }
 
 /**
- * Hook to update booking status (instructor/admin only)
+ * Update booking status (instructor/admin only).
  */
 export function useUpdateBookingStatus(bookingId: number) {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
 
-  return useMutation({
-    mutationFn: async (status: 'confirmed' | 'cancelled' | 'completed' | 'no_show') => {
-      return await apiClient.put<IBooking>(`/api/bookings/${bookingId}/status`, { status });
+  return useMutation<void, Error, 'confirmed' | 'cancelled' | 'completed' | 'no_show'>({
+    mutationFn: async (status) => {
+      const response = await apiClient.put<ApiResponse>(
+        `/api/bookings/${bookingId}/status`,
+        { status }
+      );
+      if (!response.success) {
+        throw new Error(response.error || response.message || 'Failed to update');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.instructor });
