@@ -180,6 +180,46 @@ export function useCancelBooking() {
 /**
  * Update booking status (instructor/admin only).
  */
+/**
+ * Create a Paymob checkout session and get redirect URL.
+ */
+export function useCreateCheckoutSession() {
+  return useMutation<{ redirectUrl: string }, Error, { bookingId: number; paymentMethod: string }>({
+    mutationFn: async ({ bookingId, paymentMethod }) => {
+      const response = await apiClient.post<ApiResponse<{ redirectUrl: string }>>(
+        `/api/bookings/${bookingId}/pay/paymob`,
+        { payment_method: paymentMethod }
+      );
+      return unwrap(response);
+    },
+  });
+}
+
+/**
+ * Poll booking payment status every 3 seconds.
+ * Stops polling once status leaves 'pending_payment'.
+ */
+export function useBookingPayStatus(bookingId: number) {
+  return useQuery({
+    queryKey: [...BOOKINGS_QUERY_KEYS.detail(bookingId), 'pay-status'],
+    enabled: Number.isFinite(bookingId) && bookingId > 0,
+    refetchInterval: (query) => {
+      const data = query.state.data as { status: string } | undefined;
+      if (data && data.status !== 'pending_payment') return false;
+      return 3000;
+    },
+    queryFn: async () => {
+      const response = await apiClient.get<ApiResponse<{ status: string; payment_status: string }>>(
+        `/api/bookings/${bookingId}/pay-status`
+      );
+      return unwrap(response);
+    },
+  });
+}
+
+/**
+ * Update booking status (instructor/admin only).
+ */
 export function useUpdateBookingStatus(bookingId: number) {
   const queryClient = useQueryClient();
   const { addNotification } = useNotifications();
