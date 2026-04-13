@@ -13,30 +13,32 @@ export default async function InstructorLayout({ children }: { children: ReactNo
   const user = await requireRole([UserRole.INSTRUCTOR, UserRole.ADMIN]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-[var(--color-bg)]">
+      <nav className="bg-[var(--color-primary)] shadow-[var(--shadow-md)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold">Mihraby Instructor</h1>
-              <div className="ml-6 flex gap-4 text-sm text-gray-600">
-                <Link href="/instructor/courses" className="hover:text-gray-900">
+              <Link href="/instructor" className="text-xl font-bold text-[var(--color-text-on-primary)] font-[family-name:var(--font-heading)]">
+                Mihraby
+              </Link>
+              <div className="ml-8 flex gap-6 text-sm">
+                <Link href="/instructor/courses" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors">
                   My Courses
                 </Link>
-                <Link href="/instructor/courses/new" className="hover:text-gray-900">
+                <Link href="/instructor/courses/new" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors">
                   Create
                 </Link>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-gray-700">{user?.name ?? ''}</span>
+              <span className="text-sm text-[var(--color-text-on-primary)]/70">{user?.name ?? ''}</span>
               <LogoutButton />
             </div>
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">{children}</div>
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {children}
       </main>
     </div>
   );

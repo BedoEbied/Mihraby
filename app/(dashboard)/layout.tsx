@@ -8,8 +8,8 @@ export const metadata = {
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Suspense fallback={<div className="p-6">Loading dashboard...</div>}>
+    <div className="min-h-screen bg-[var(--color-bg)]">
+      <Suspense fallback={<div className="p-6 text-[var(--color-text-muted)]">Loading dashboard...</div>}>
         {children}
       </Suspense>
     </div>
