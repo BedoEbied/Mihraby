@@ -38,8 +38,7 @@ export default function RegisterPage() {
 
       if (response.success && response.data) {
         login(response.data.user);
-        
-        // Redirect based on role
+
         switch (response.data.user.role) {
           case 'admin':
             router.push('/admin');
@@ -64,27 +63,27 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="max-w-md w-full space-y-8 bg-white shadow rounded-lg p-8">
+    <div className="max-w-md w-full space-y-8 bg-[var(--color-surface)] rounded-xl p-8 shadow-[var(--shadow-lg)]">
       <div>
-        <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="text-center text-3xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">
           Create your Mihraby account
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-[var(--color-text-secondary)]">
           Or{' '}
-          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <Link href="/login" className="font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-light)]">
             sign in to your existing account
           </Link>
         </p>
       </div>
-      <form className="mt-4 space-y-6" onSubmit={handleSubmit}>
+      <form className="mt-4 space-y-5" onSubmit={handleSubmit}>
         {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="rounded-lg bg-[var(--color-error-light)] p-4 border border-[var(--color-error)]/20">
+            <p className="text-sm text-[var(--color-error)]">{error}</p>
           </div>
         )}
-        <div className="rounded-md shadow-sm space-y-4">
+        <div className="space-y-4">
           <div>
-            <label htmlFor="name" className="sr-only">
+            <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
               Full Name
             </label>
             <input
@@ -92,14 +91,14 @@ export default function RegisterPage() {
               name="name"
               type="text"
               required
-              className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Full Name"
+              className="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-white)] text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] text-sm transition-colors"
+              placeholder="Your full name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
           </div>
           <div>
-            <label htmlFor="email" className="sr-only">
+            <label htmlFor="email" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
               Email address
             </label>
             <input
@@ -107,14 +106,14 @@ export default function RegisterPage() {
               name="email"
               type="email"
               required
-              className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Email address"
+              className="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-white)] text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] text-sm transition-colors"
+              placeholder="you@example.com"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
           <div>
-            <label htmlFor="password" className="sr-only">
+            <label htmlFor="password" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
               Password
             </label>
             <input
@@ -122,14 +121,14 @@ export default function RegisterPage() {
               name="password"
               type="password"
               required
-              className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
+              className="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-white)] text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] text-sm transition-colors"
+              placeholder="Create a password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="sr-only">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
               Confirm Password
             </label>
             <input
@@ -137,23 +136,21 @@ export default function RegisterPage() {
               name="confirmPassword"
               type="password"
               required
-              className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Confirm Password"
+              className="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-white)] text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] text-sm transition-colors"
+              placeholder="Confirm your password"
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             />
           </div>
         </div>
 
-        <div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-          >
-            {isLoading ? 'Creating account...' : 'Create account'}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-[var(--color-text-on-accent)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-accent)] disabled:opacity-50 transition-colors"
+        >
+          {isLoading ? 'Creating account...' : 'Create account'}
+        </button>
       </form>
     </div>
   );
