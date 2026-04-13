@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCourses } from '@/features/courses/api';
 import type { CourseWithInstructor } from '@/lib/types';
+import { formatPrice } from '@/lib/format';
 
 export function StudentCoursesList() {
   const { data, isLoading, error } = useCourses();
@@ -13,17 +14,17 @@ export function StudentCoursesList() {
   const courses: CourseWithInstructor[] = response?.data?.courses ?? [];
 
   if (isLoading) {
-    return <p className="text-gray-600">Loading courses...</p>;
+    return <p className="text-[var(--color-text-secondary)]">Loading courses...</p>;
   }
   if (error) {
     return (
-      <p className="text-red-600">Failed to load courses: {error.message}</p>
+      <p className="text-[var(--color-error)]">Failed to load courses. Please try again later.</p>
     );
   }
   if (courses.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-        <p className="text-gray-600">No published courses yet.</p>
+      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center shadow-[var(--shadow-sm)]">
+        <p className="text-[var(--color-text-secondary)]">No courses available right now. Check back soon for new offerings.</p>
       </div>
     );
   }
@@ -34,15 +35,15 @@ export function StudentCoursesList() {
         <Link
           key={course.id}
           href={`/student/courses/${course.id}`}
-          className="block rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:border-blue-300 hover:shadow"
+          className="block rounded-xl border border-[var(--color-border)] border-s-4 border-s-[var(--color-accent)] bg-[var(--color-bg-white)] p-6 shadow-[var(--shadow-sm)] hover:border-[var(--color-accent)]/50 hover:shadow-[var(--shadow-md)] transition-[border-color,box-shadow] duration-200"
         >
-          <h3 className="font-semibold text-gray-900">{course.title}</h3>
-          <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+          <h3 className="font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] truncate">{course.title}</h3>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)] line-clamp-2">
             {course.description ?? 'No description'}
           </p>
           <div className="mt-3 flex items-center justify-between">
-            <span className="text-sm font-medium text-blue-600">
-              ${Number(course.price)}
+            <span className="text-sm font-medium text-[var(--color-accent)]">
+              {formatPrice(course.price)}
             </span>
           </div>
         </Link>

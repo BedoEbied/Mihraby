@@ -36,11 +36,11 @@ export function CreateCourseForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+      className="max-w-xl rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-white)] p-6 shadow-[var(--shadow-sm)]"
     >
       <div className="space-y-4">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="title" className="block text-sm font-medium text-[var(--color-text-secondary)]">
             Title
           </label>
           <input
@@ -49,11 +49,11 @@ export function CreateCourseForm() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2.5 focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
           />
         </div>
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="description" className="block text-sm font-medium text-[var(--color-text-secondary)]">
             Description
           </label>
           <textarea
@@ -61,12 +61,12 @@ export function CreateCourseForm() {
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2.5 focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
           />
         </div>
         <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-            Price ($)
+          <label htmlFor="price" className="block text-sm font-medium text-[var(--color-text-secondary)]">
+            Price (USD)
           </label>
           <input
             id="price"
@@ -76,18 +76,18 @@ export function CreateCourseForm() {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2.5 focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
           />
         </div>
         <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="status" className="block text-sm font-medium text-[var(--color-text-secondary)]">
             Status
           </label>
           <select
             id="status"
             value={status}
             onChange={(e) => setStatus(e.target.value as 'draft' | 'published')}
-            className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2.5 focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
           >
             <option value="draft">Draft</option>
             <option value="published">Published</option>
@@ -98,7 +98,7 @@ export function CreateCourseForm() {
         <button
           type="submit"
           disabled={createCourse.isPending}
-          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-lg bg-[var(--color-accent)] px-5 py-2.5 text-sm font-medium text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)] disabled:opacity-50"
         >
           {createCourse.isPending ? 'Creating...' : 'Create course'}
         </button>

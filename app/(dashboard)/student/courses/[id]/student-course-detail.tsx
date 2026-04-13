@@ -8,6 +8,7 @@ import { SlotPicker } from '@/features/time-slots';
 import { useAvailableSlots } from '@/features/time-slots/api';
 import { useInitiateBooking, useCreateCheckoutSession } from '@/features/bookings/api';
 import type { ITimeSlot, PaymentMethod } from '@/lib/types';
+import { formatPrice } from '@/lib/format';
 
 type StudentCourseDetailProps = {
   courseId: number;
@@ -79,10 +80,13 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
     );
   };
 
-  if (courseLoading || courseError || !course) {
+  if (courseLoading) {
+    return <p className="text-[var(--color-text-muted)]">Loading course...</p>;
+  }
+  if (courseError || !course) {
     return (
-      <p className="text-red-600">
-        {courseError instanceof Error ? courseError.message : 'Loading...'}
+      <p className="text-[var(--color-error)]">
+        Failed to load course. Please try again later.
       </p>
     );
   }
@@ -91,20 +95,20 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="text-xl font-bold text-gray-900">{course.title}</h2>
-        <p className="mt-2 text-gray-600">{course.description ?? 'No description'}</p>
+      <div className="rounded-xl border border-[var(--color-border)] border-s-4 border-s-[var(--color-accent)] bg-[var(--color-bg-white)] p-6 shadow-[var(--shadow-sm)]">
+        <h2 className="text-xl font-bold text-[var(--color-text)] font-[family-name:var(--font-heading)] break-words">{course.title}</h2>
+        <p className="mt-2 text-[var(--color-text-secondary)]">{course.description ?? 'No description'}</p>
         <div className="mt-3">
-          <span className="text-lg font-semibold text-blue-600">
-            {price} EGP / session
+          <span className="text-lg font-semibold text-[var(--color-accent)]">
+            {formatPrice(price)} / session
           </span>
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">1. Pick a time</h3>
+      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-white)] p-6 shadow-[var(--shadow-sm)]">
+        <h3 className="text-lg font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] mb-3">1. Pick a time</h3>
         {slotsLoading ? (
-          <p className="text-sm text-gray-500">Loading slots...</p>
+          <p className="text-sm text-[var(--color-text-muted)]">Loading slots...</p>
         ) : (
           <SlotPicker
             courseId={courseId}
@@ -116,8 +120,8 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
       </div>
 
       {selectedSlot && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">2. Payment method</h3>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-white)] p-6 shadow-[var(--shadow-sm)]">
+          <h3 className="text-lg font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] mb-3">2. Payment method</h3>
           <div className="space-y-2">
             {PAYMENT_METHODS.map((pm) => (
               <label key={pm.value} className="flex items-center gap-3 cursor-pointer">
@@ -127,9 +131,9 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
                   value={pm.value}
                   checked={paymentMethod === pm.value}
                   onChange={() => setPaymentMethod(pm.value)}
-                  className="h-4 w-4 text-blue-600"
+                  className="h-4 w-4 accent-[var(--color-accent)]"
                 />
-                <span className="text-sm text-gray-700">{pm.label}</span>
+                <span className="text-sm text-[var(--color-text-secondary)]">{pm.label}</span>
               </label>
             ))}
           </div>
@@ -139,12 +143,12 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
               type="button"
               onClick={handleBook}
               disabled={initiate.isPending || checkout.isPending}
-              className="rounded bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-[var(--color-accent)] px-6 py-2.5 text-sm font-medium text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)] disabled:opacity-50"
             >
-              {initiate.isPending || checkout.isPending ? 'Processing...' : `Book for ${price} EGP`}
+              {initiate.isPending || checkout.isPending ? 'Processing...' : `Book for ${formatPrice(price)}`}
             </button>
             {initiate.isError && (
-              <p className="text-sm text-red-600">{initiate.error.message}</p>
+              <p className="text-sm text-[var(--color-error)]">Booking failed. Please try again.</p>
             )}
           </div>
         </div>

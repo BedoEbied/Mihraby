@@ -17,31 +17,42 @@ type NotificationsStore = {
   clearNotifications: () => void;
 };
 
+// Track auto-dismiss timers so they can be cleared on manual dismiss or clearAll
+const timers = new Map<string, NodeJS.Timeout>();
+
 export const useNotifications = create<NotificationsStore>((set) => ({
   notifications: [],
-  
+
   addNotification: (notification) => {
     const id = Date.now().toString();
     const newNotification = { ...notification, id };
-    
+
     set((state) => ({
       notifications: [...state.notifications, newNotification],
     }));
 
-    // Auto-remove after duration
     if (notification.duration !== 0) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        timers.delete(id);
         set((state) => ({
           notifications: state.notifications.filter((n) => n.id !== id),
         }));
       }, notification.duration || 5000);
+      timers.set(id, timer);
     }
   },
-  
-  removeNotification: (id) =>
+
+  removeNotification: (id) => {
+    const timer = timers.get(id);
+    if (timer) { clearTimeout(timer); timers.delete(id); }
     set((state) => ({
       notifications: state.notifications.filter((n) => n.id !== id),
-    })),
-    
-  clearNotifications: () => set({ notifications: [] }),
+    }));
+  },
+
+  clearNotifications: () => {
+    timers.forEach((timer) => clearTimeout(timer));
+    timers.clear();
+    set({ notifications: [] });
+  },
 }));

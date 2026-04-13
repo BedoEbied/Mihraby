@@ -19,7 +19,7 @@ export function LogoutButton() {
     <button
       onClick={handleLogout}
       disabled={isPending}
-      className="text-gray-700 hover:text-gray-900 cursor-pointer disabled:opacity-50"
+      className="text-[var(--color-text-on-primary)]/70 hover:text-[var(--color-text-on-primary)] cursor-pointer disabled:opacity-50 text-sm transition-colors px-2 py-2"
     >
       {isPending ? 'Logging out...' : 'Logout'}
     </button>

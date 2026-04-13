@@ -1,1 +1,1 @@
-export { useTimeSlots, useAvailableSlots, useCreateTimeSlot, useUpdateTimeSlot, useDeleteTimeSlot } from './use-time-slots';
+export { useTimeSlots, useAvailableSlots, useCreateTimeSlot, useCreateTimeSlotsBulk, useUpdateTimeSlot, useDeleteTimeSlot } from './use-time-slots';

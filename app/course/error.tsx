@@ -2,12 +2,12 @@
 
 export default function CourseError({ error, reset }: { error: Error; reset: () => void }) {
   return (
-    <div className="p-6 space-y-2">
-      <h2 className="text-lg font-semibold text-red-700">Could not load course content</h2>
-      <p className="text-sm text-red-600">{error.message}</p>
+    <div className="p-6 space-y-3">
+      <h2 className="text-lg font-semibold text-[var(--color-error)] font-[family-name:var(--font-heading)]">Could not load course content</h2>
+      <p className="text-sm text-[var(--color-text-secondary)]">{error.message}</p>
       <button
         onClick={reset}
-        className="px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+        className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)] text-sm font-medium transition-colors"
       >
         Retry
       </button>

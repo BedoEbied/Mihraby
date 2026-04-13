@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useInstructorCourses } from '@/features/courses/api';
 import type { ICourse } from '@/lib/types';
+import { formatPrice } from '@/lib/format';
 
 export function InstructorCoursesList() {
   const { data, isLoading, error } = useInstructorCourses();
@@ -12,20 +13,20 @@ export function InstructorCoursesList() {
     : [];
 
   if (isLoading) {
-    return <p className="text-gray-600">Loading courses...</p>;
+    return <p className="text-[var(--color-text-secondary)]">Loading courses...</p>;
   }
   if (error) {
     return (
-      <p className="text-red-600">Failed to load courses: {error.message}</p>
+      <p className="text-[var(--color-error)]">Failed to load courses. Please try again later.</p>
     );
   }
   if (courses.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-        <p className="text-gray-600">You have no courses yet.</p>
+      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-white)] p-8 text-center shadow-[var(--shadow-sm)]">
+        <p className="text-[var(--color-text-secondary)]">You have no courses yet.</p>
         <Link
           href="/instructor/courses/new"
-          className="mt-4 inline-block rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="mt-4 inline-block rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)]"
         >
           Create your first course
         </Link>
@@ -39,17 +40,17 @@ export function InstructorCoursesList() {
         <Link
           key={course.id}
           href={`/instructor/courses/${course.id}`}
-          className="block rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:border-blue-300 hover:shadow"
+          className="block rounded-xl border-s-4 border-s-[var(--color-accent)] border border-[var(--color-border)] bg-[var(--color-bg-white)] p-6 shadow-[var(--shadow-sm)] hover:border-[var(--color-accent)]/50 hover:shadow-[var(--shadow-md)] transition-[border-color,box-shadow] duration-200"
         >
-          <h3 className="font-semibold text-gray-900">{course.title}</h3>
-          <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+          <h3 className="font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] truncate">{course.title}</h3>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)] line-clamp-2">
             {course.description ?? 'No description'}
           </p>
           <div className="mt-3 flex items-center justify-between">
-            <span className="text-sm font-medium text-blue-600">
-              ${Number(course.price)}
+            <span className="text-sm font-medium text-[var(--color-accent)]">
+              {formatPrice(course.price)}
             </span>
-            <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+            <span className="whitespace-nowrap rounded bg-[var(--color-surface)] px-2 py-0.5 text-xs text-[var(--color-text-secondary)]">
               {course.status}
             </span>
           </div>
