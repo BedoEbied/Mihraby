@@ -1,6 +1,7 @@
 'use client';
 
 import { ITimeSlot } from '@/lib/types';
+import { formatInCairo } from '@/lib/time';
 
 type TimeSlotCalendarProps = {
   slots: ITimeSlot[];
@@ -12,10 +13,7 @@ type TimeSlotCalendarProps = {
 
 function formatSlotTime(d: Date | string): string {
   const date = typeof d === 'string' ? new Date(d) : d;
-  return date.toLocaleString(undefined, {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
+  return formatInCairo(date);
 }
 
 export default function TimeSlotCalendar({
@@ -27,25 +25,25 @@ export default function TimeSlotCalendar({
 }: TimeSlotCalendarProps) {
   if (slots.length === 0) {
     return (
-      <p className="text-sm text-gray-500">No time slots yet. Add one below.</p>
+      <p className="text-sm text-[var(--color-text-muted)]">No time slots added yet. Create one to let students book sessions.</p>
     );
   }
 
   return (
-    <div className="rounded border border-gray-200 bg-white overflow-hidden">
-      <ul className="divide-y divide-gray-200">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-white)] overflow-hidden">
+      <ul className="divide-y divide-[var(--color-border)]">
         {slots.map((s) => (
           <li
             key={s.id}
-            className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-gray-50"
+            className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-[var(--color-surface)]"
           >
             <div className="text-sm">
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-[var(--color-text)]">
                 {formatSlotTime(s.start_time)} – {formatSlotTime(s.end_time)}
               </span>
               <span
-                className={`ml-2 rounded px-1.5 py-0.5 text-xs ${
-                  s.is_available ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                className={`ms-2 rounded px-1.5 py-0.5 text-xs ${
+                  s.is_available ? 'bg-[var(--color-success-light)] text-[var(--color-success)]' : 'bg-[var(--color-surface)] text-[var(--color-text-muted)]'
                 }`}
               >
                 {s.is_available ? 'Available' : 'Booked'}
@@ -56,7 +54,7 @@ export default function TimeSlotCalendar({
                 <button
                   type="button"
                   onClick={() => onEdit(s)}
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm text-[var(--color-accent)] hover:text-[var(--color-primary)] px-2 py-1.5"
                 >
                   Edit
                 </button>
@@ -66,7 +64,7 @@ export default function TimeSlotCalendar({
                   type="button"
                   onClick={() => onDelete(s)}
                   disabled={isDeletingId === s.id}
-                  className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+                  className="text-sm text-[var(--color-error)] hover:opacity-80 disabled:opacity-50 px-2 py-1.5"
                 >
                   {isDeletingId === s.id ? 'Deleting...' : 'Delete'}
                 </button>
@@ -75,7 +73,7 @@ export default function TimeSlotCalendar({
                 <button
                   type="button"
                   onClick={() => onSlotSelect(s)}
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm text-[var(--color-accent)] hover:text-[var(--color-primary)] px-2 py-1.5"
                 >
                   Select
                 </button>

@@ -68,18 +68,18 @@ export default function TimeSlotForm({
   );
 
   return (
-    <form onSubmit={handleSubmit} className="rounded border border-gray-200 bg-gray-50 p-4">
-      <h3 className="text-sm font-semibold text-gray-800 mb-3">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+      <h3 className="text-sm font-semibold text-[var(--color-text)] mb-3">
         {slot ? `Edit slot #${slot.id}` : 'Add time slot'}
       </h3>
       {error && (
-        <p className="mb-3 text-sm text-red-600" role="alert">
+        <p className="mb-3 text-sm text-[var(--color-error)]" role="alert">
           {error}
         </p>
       )}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <label htmlFor="start_time" className="block text-xs font-medium text-gray-600 mb-1">
+          <label htmlFor="start_time" className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
             Start
           </label>
           <input
@@ -88,12 +88,13 @@ export default function TimeSlotForm({
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             min={slot ? undefined : toDateTimeLocal(now)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            suppressHydrationWarning
+            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2.5 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
             required
           />
         </div>
         <div>
-          <label htmlFor="end_time" className="block text-xs font-medium text-gray-600 mb-1">
+          <label htmlFor="end_time" className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
             End
           </label>
           <input
@@ -102,7 +103,8 @@ export default function TimeSlotForm({
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
             min={startTime}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            suppressHydrationWarning
+            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2.5 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/30"
             required
           />
         </div>
@@ -111,7 +113,7 @@ export default function TimeSlotForm({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-lg bg-[var(--color-accent)] px-3 py-2 text-sm font-medium text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)] disabled:opacity-50"
         >
           {isPending ? 'Saving...' : slot ? 'Update slot' : 'Add slot'}
         </button>
@@ -119,7 +121,7 @@ export default function TimeSlotForm({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-white)] px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
           >
             Cancel
           </button>
