@@ -2,18 +2,20 @@
 
 import { useMyBookings, useCancelBooking } from '@/features/bookings/api';
 import type { BookingWithDetails } from '@/lib/types';
+import { formatPrice } from '@/lib/format';
+import { formatInCairo } from '@/lib/time';
 
 function formatDate(d: Date | string): string {
-  return new Date(d).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+  return formatInCairo(new Date(d));
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  pending_payment: 'bg-amber-100 text-amber-800',
-  pending_review: 'bg-purple-100 text-purple-800',
-  confirmed: 'bg-green-100 text-green-800',
-  cancelled: 'bg-gray-100 text-gray-500',
-  completed: 'bg-blue-100 text-blue-800',
-  no_show: 'bg-red-100 text-red-800',
+  pending_payment: 'bg-[var(--color-accent)]/10 text-[var(--color-accent-dark)]',
+  pending_review: 'bg-[var(--color-surface)] text-[var(--color-primary)]',
+  confirmed: 'bg-[var(--color-success-light)] text-[var(--color-success)]',
+  cancelled: 'bg-[var(--color-surface-dark)] text-[var(--color-text-muted)]',
+  completed: 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]',
+  no_show: 'bg-[var(--color-error-light)] text-[var(--color-error)]',
 };
 
 function BookingRow({ booking }: { booking: BookingWithDetails }) {
@@ -21,22 +23,22 @@ function BookingRow({ booking }: { booking: BookingWithDetails }) {
   const canCancel = booking.status === 'pending_payment' || booking.status === 'pending_review';
 
   return (
-    <li className="rounded border border-gray-200 bg-white p-4">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="font-medium text-gray-900">{booking.course_title}</p>
-          <p className="text-sm text-gray-500">
+    <li className="rounded-xl border border-[var(--color-border)] border-s-4 border-s-[var(--color-accent)] bg-[var(--color-bg-white)] p-4 shadow-[var(--shadow-sm)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-medium text-[var(--color-text)] font-[family-name:var(--font-heading)] truncate">{booking.course_title}</p>
+          <p className="text-sm text-[var(--color-text-muted)]">
             {formatDate(booking.slot_start_time)} &ndash; {formatDate(booking.slot_end_time)}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--color-text-muted)] truncate">
             Instructor: {booking.instructor_name}
           </p>
-          <p className="text-sm text-gray-600 mt-1">
-            {Number(booking.amount)} EGP &middot; {booking.payment_method ?? 'not set'}
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            {formatPrice(booking.amount)} &middot; {booking.payment_method ?? 'not set'}
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[booking.status] ?? 'bg-gray-100'}`}>
+          <span className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[booking.status] ?? 'bg-[var(--color-surface)]'}`}>
             {booking.status.replace('_', ' ')}
           </span>
           {canCancel && (
@@ -44,7 +46,7 @@ function BookingRow({ booking }: { booking: BookingWithDetails }) {
               type="button"
               onClick={() => cancel.mutate(booking.id)}
               disabled={cancel.isPending}
-              className="text-xs text-red-600 hover:underline disabled:opacity-50"
+              className="text-sm text-[var(--color-error)] hover:underline disabled:opacity-50 transition-colors px-2 py-1.5"
             >
               {cancel.isPending ? 'Cancelling...' : 'Cancel'}
             </button>
@@ -58,13 +60,13 @@ function BookingRow({ booking }: { booking: BookingWithDetails }) {
 export default function MyBookings() {
   const { data: bookings = [], isLoading, error } = useMyBookings();
 
-  if (isLoading) return <p className="text-sm text-gray-500">Loading bookings...</p>;
-  if (error) return <p className="text-sm text-red-600">Failed to load bookings</p>;
+  if (isLoading) return <p className="text-sm text-[var(--color-text-muted)]">Loading bookings...</p>;
+  if (error) return <p className="text-sm text-[var(--color-error)]">Failed to load bookings</p>;
 
   if (bookings.length === 0) {
     return (
-      <div className="rounded border border-gray-200 bg-white p-6 text-center">
-        <p className="text-gray-500">No bookings yet. Browse courses to book a session.</p>
+      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center shadow-[var(--shadow-sm)]">
+        <p className="text-[var(--color-text-muted)]">You have no bookings yet. Browse courses to book your first session.</p>
       </div>
     );
   }
