@@ -56,7 +56,7 @@ export default function CourseTimeSlotsManager({ courseId }: CourseTimeSlotsMana
   };
 
   const handleDelete = (slot: ITimeSlot) => {
-    if (!confirm('Remove this time slot?')) return;
+    if (!confirm('Delete this time slot? Students will no longer be able to book it.')) return;
     setDeletingSlotId(slot.id);
     deleteSlot.mutate(slot.id, {
       onSettled: () => setDeletingSlotId(null),
@@ -64,12 +64,12 @@ export default function CourseTimeSlotsManager({ courseId }: CourseTimeSlotsMana
   };
 
   if (isLoading) {
-    return <p className="text-sm text-gray-500">Loading slots...</p>;
+    return <p className="text-sm text-[var(--color-text-muted)]">Loading slots...</p>;
   }
   if (error) {
     return (
-      <p className="text-sm text-red-600">
-        Failed to load slots: {error.message}
+      <p className="text-sm text-[var(--color-error)]">
+        Failed to load time slots. Please try again later.
       </p>
     );
   }
@@ -77,12 +77,12 @@ export default function CourseTimeSlotsManager({ courseId }: CourseTimeSlotsMana
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Time slots</h3>
+        <h3 className="text-lg font-semibold font-[family-name:var(--font-heading)] text-[var(--color-text)]">Time slots</h3>
         {!showForm && !editingSlot && (
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="rounded-lg bg-[var(--color-accent)] px-3 py-1.5 text-sm font-medium text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)]"
           >
             Add slot
           </button>

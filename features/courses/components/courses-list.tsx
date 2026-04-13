@@ -4,6 +4,7 @@ import { useCourses, useDeleteCourse } from '@/features/courses/api';
 import { useAuthorization } from '@/lib/authorization';
 import { ErrorBoundary } from '@/lib/components/error-boundary';
 import { CourseWithInstructor } from '@/types';
+import { formatPrice } from '@/lib/format';
 
 export const CoursesList = () => {
   const { data: courses, isLoading, error } = useCourses();
@@ -11,34 +12,42 @@ export const CoursesList = () => {
   const { checkAccess } = useAuthorization();
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading courses...</div>;
+    return <div className="text-center py-8 text-[var(--color-text-muted)]">Loading courses...</div>;
   }
 
   if (error) {
     return (
-      <div className="text-center py-8 text-red-600">
-        Error loading courses: {error.message}
+      <div className="text-center py-8 text-[var(--color-error)]">
+        Failed to load courses. Please try again later.
       </div>
     );
   }
 
   const handleDelete = async (courseId: number) => {
-    if (confirm('Are you sure you want to delete this course?')) {
+    if (confirm('Delete this course? This action cannot be undone.')) {
       await deleteCourse.mutateAsync(courseId);
     }
   };
 
+  if (!courses?.data?.length) {
+    return (
+      <div className="text-center py-8 text-[var(--color-text-muted)]">
+        No courses found. Check back later or adjust your filters.
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {courses?.data?.map((course: CourseWithInstructor) => (
-        <div key={course.id} className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-2">{course.title}</h3>
-          <p className="text-gray-600 mb-4 line-clamp-2">{course.description}</p>
+      {courses.data.map((course: CourseWithInstructor) => (
+        <div key={course.id} className="bg-[var(--color-bg-white)] rounded-xl border border-[var(--color-border)] shadow-sm p-6">
+          <h3 className="text-lg font-semibold font-[family-name:var(--font-heading)] text-[var(--color-text)] mb-2 truncate">{course.title}</h3>
+          <p className="text-[var(--color-text-secondary)] mb-4 line-clamp-2">{course.description}</p>
           <div className="flex items-center justify-between">
-            <span className="text-blue-600 font-bold">${course.price}</span>
+            <span className="text-[var(--color-accent)] font-bold">{formatPrice(course.price)}</span>
             <div className="flex gap-2">
               {checkAccess('course:update', course) && (
-                <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                <button className="px-4 py-2 border border-[var(--color-accent)] text-[var(--color-accent)] rounded-lg hover:bg-[var(--color-accent)]/10">
                   Edit
                 </button>
               )}
@@ -46,7 +55,7 @@ export const CoursesList = () => {
                 <button
                   onClick={() => handleDelete(course.id)}
                   disabled={deleteCourse.isPending}
-                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+                  className="px-4 py-2 text-[var(--color-error)] border border-[var(--color-error)] rounded-lg hover:bg-[var(--color-error)]/10 disabled:opacity-50"
                 >
                   {deleteCourse.isPending ? 'Deleting...' : 'Delete'}
                 </button>
@@ -63,7 +72,7 @@ export const CoursesList = () => {
 export const CoursesListWithBoundary = () => (
   <ErrorBoundary
     fallback={
-      <div className="text-center py-8 text-red-600">
+      <div className="text-center py-8 text-[var(--color-error)]">
         Something went wrong loading courses. Please try again.
       </div>
     }

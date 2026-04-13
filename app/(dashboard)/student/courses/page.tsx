@@ -8,7 +8,10 @@ export const metadata: Metadata = {
 export default function StudentCoursesPage() {
   return (
     <>
-      <h2 className="text-2xl font-bold mb-4">Browse courses</h2>
+      <div className="mb-6">
+        <p className="text-xs font-semibold tracking-widest text-[var(--color-accent)] uppercase mb-1">Explore</p>
+        <h2 className="text-2xl font-bold text-[var(--color-text)] font-[family-name:var(--font-heading)]">Browse Courses</h2>
+      </div>
       <StudentCoursesList />
     </>
   );

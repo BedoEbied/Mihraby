@@ -14,23 +14,24 @@ export default async function StudentLayout({ children }: { children: ReactNode 
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)]">
-      <nav className="bg-[var(--color-primary)] shadow-[var(--shadow-md)]">
+      <nav className="bg-[var(--color-primary)] border-b-2 border-[var(--color-accent)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/student" className="text-xl font-bold text-[var(--color-text-on-primary)] font-[family-name:var(--font-heading)]">
+              <Link href="/student" className="text-2xl font-bold text-[var(--color-text-on-primary)] font-[family-name:var(--font-heading)]">
                 Mihraby
               </Link>
-              <div className="ml-8 flex gap-6 text-sm">
-                <Link href="/student/courses" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors">
+              <div className="ms-4 sm:ms-10 flex gap-3 sm:gap-8 text-sm font-medium">
+                <Link href="/student/courses" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors py-2">
                   Courses
                 </Link>
-                <Link href="/student/bookings" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors">
+                <Link href="/student/bookings" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors py-2 whitespace-nowrap">
                   My Bookings
                 </Link>
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[var(--color-accent)] text-xs font-bold text-[var(--color-text-on-primary)]">{(user?.name ?? '?')[0].toUpperCase()}</span>
               <span className="text-sm text-[var(--color-text-on-primary)]/70">{user?.name ?? ''}</span>
               <LogoutButton />
             </div>

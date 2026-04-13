@@ -16,8 +16,8 @@ export default async function StudentCoursePage({ params }: PageProps) {
   if (Number.isNaN(courseId)) {
     return (
       <div>
-        <p className="text-red-600">Invalid course ID</p>
-        <Link href="/student/courses" className="text-blue-600 hover:underline">
+        <p className="text-[var(--color-error)]">Invalid course ID</p>
+        <Link href="/student/courses" className="text-[var(--color-accent)] hover:text-[var(--color-accent-light)] hover:underline">
           Back to courses
         </Link>
       </div>
@@ -29,7 +29,7 @@ export default async function StudentCoursePage({ params }: PageProps) {
       <div className="mb-4">
         <Link
           href="/student/courses"
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent-light)] hover:underline"
         >
           ← Back to courses
         </Link>

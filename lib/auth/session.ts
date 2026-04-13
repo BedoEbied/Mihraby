@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -7,7 +8,9 @@ import { UserRole, UserWithoutPassword } from '@/types';
 
 const AUTH_COOKIE = 'auth_token';
 
-export async function getSessionUser(): Promise<UserWithoutPassword | null> {
+// Wrapped in React cache() to deduplicate within a single request.
+// Layout and page can both call getSessionUser() without hitting the DB twice.
+export const getSessionUser = cache(async function getSessionUser(): Promise<UserWithoutPassword | null> {
   noStore();
   let token: string | undefined;
   try {
@@ -30,7 +33,7 @@ export async function getSessionUser(): Promise<UserWithoutPassword | null> {
     console.error('Session decode failed', err);
     return null;
   }
-}
+});
 
 export async function requireRole(allowed: UserRole[]) {
   const user = await getSessionUser();

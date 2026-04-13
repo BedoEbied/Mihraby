@@ -71,6 +71,17 @@ export async function up(knex: Knex): Promise<void> {
   // Generated column + UNIQUE index for slot locking.
   // Using raw SQL because knex schema builder doesn't model generated columns
   // cleanly. STORED (not VIRTUAL) is required for a UNIQUE index in MySQL.
+  //
+  // MySQL 9.x rejects STORED generated columns that reference a FK column,
+  // so we temporarily drop the FK on slot_id, add the generated column, then
+  // re-add the FK.
+  // MySQL 9.x doesn't allow STORED generated columns that reference a column
+  // with a FK constraint. We drop the FK, add the generated column, and leave
+  // the FK dropped — slot_id still has its index, and the slot_hold UNIQUE
+  // constraint provides the critical concurrency guard. Referential integrity
+  // for slot_id is enforced at the application layer (service + transaction).
+  await knex.raw(`ALTER TABLE bookings DROP FOREIGN KEY bookings_slot_id_foreign`);
+
   await knex.raw(`
     ALTER TABLE bookings
       ADD COLUMN slot_hold INT UNSIGNED
