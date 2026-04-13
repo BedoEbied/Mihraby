@@ -1,12 +1,14 @@
 # Mihraby UI Redesign Implementation Plan
 
+> **Status: COMPLETE** — Merged to `develop` on 2026-04-13. Phase A (mockups) was skipped in favour of direct implementation. Phase B fully delivered. Typography updated post-merge: Fraunces + Outfit replacing Lora + DM Sans per user preference.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Redesign the entire Mihraby frontend from generic Tailwind/indigo to a branded Deep Teal + Gold + Warm Linen theme with Lora/Cairo/DM Sans typography, across all 3 roles (Student, Instructor, Admin).
+**Goal:** Redesign the entire Mihraby frontend from generic Tailwind/indigo to a branded Deep Teal + Gold + Warm Linen theme with Fraunces/Cairo/Outfit typography, across all 3 roles (Student, Instructor, Admin).
 
 **Architecture:** Visual-only redesign — no API, backend, or routing changes. Phase A generates mockup images via Nano Banana 2 + Stitch MCPs as reference. Phase B replaces the design system tokens and restyled every page/component in-place. Phase C runs hardening skills. All existing functionality must continue working.
 
-**Tech Stack:** Next.js 16 App Router, Tailwind CSS v4 (`@theme inline`), `next/font/google` (Lora, Cairo, DM Sans), 21st.dev MCP (selective component sourcing)
+**Tech Stack:** Next.js 16 App Router, Tailwind CSS v4 (`@theme inline`), `next/font/google` (Fraunces, Cairo, Outfit), 21st.dev MCP (selective component sourcing)
 
 **Design Tokens (confirmed):**
 | Token | Hex | CSS Variable | Role |
