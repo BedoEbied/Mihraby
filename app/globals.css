@@ -16,7 +16,7 @@
   /* Text colors */
   --color-text: #1D4040;
   --color-text-secondary: #4A6363;
-  --color-text-muted: #7A8F8F;
+  --color-text-muted: #627878;
   --color-text-on-primary: #F7F4EF;
   --color-text-on-accent: #FFFFFF;
 
@@ -38,9 +38,9 @@
   --shadow-lg: 0 10px 15px rgba(29, 64, 64, 0.1);
 
   /* Font families (set by next/font) */
-  --font-heading: var(--font-lora);
+  --font-heading: var(--font-fraunces);
   --font-heading-ar: var(--font-cairo);
-  --font-body: var(--font-dm-sans);
+  --font-body: var(--font-outfit);
 }
 
 @theme inline {
@@ -71,12 +71,27 @@
 }
 
 body {
+  /* Resolve Next.js font variables here where they're in scope */
+  --font-heading: var(--font-fraunces);
+  --font-body: var(--font-outfit);
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
 }
 
 /* Heading defaults */
 h1, h2, h3 {
-  font-family: var(--font-heading), Georgia, serif;
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

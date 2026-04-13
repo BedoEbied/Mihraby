@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  images: {
+    qualities: [70, 75, 90],
+  },
   async headers() {
     const isProd = process.env.NODE_ENV === 'production';
     return [

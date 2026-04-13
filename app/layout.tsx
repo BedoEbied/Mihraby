@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { Lora, Cairo, DM_Sans } from "next/font/google";
+import { Fraunces, Outfit, Cairo } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/providers/app-provider";
 
-const lora = Lora({
-  variable: "--font-lora",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
+  display: "swap",
+});
+
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -14,13 +21,6 @@ const cairo = Cairo({
   variable: "--font-cairo",
   subsets: ["arabic", "latin"],
   weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${lora.variable} ${cairo.variable} ${dmSans.variable} antialiased`}
+        className={`${fraunces.variable} ${outfit.variable} ${cairo.variable} antialiased`}
       >
         <AppProvider>
           {children}
