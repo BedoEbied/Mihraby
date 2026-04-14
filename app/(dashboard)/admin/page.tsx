@@ -1,23 +1,19 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { GeometricPattern, ArchDivider, CornerOrnament } from '@/lib/components/decorative';
+import { requireRole } from '@/lib/auth/session';
+import { BookingService } from '@/lib/services/bookingService';
+import { formatPrice } from '@/lib/format';
+import { UserRole } from '@/types';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard | Mihraby',
 };
 
-/* ── Placeholder data ── */
 const stats = [
   { label: 'Total Users', value: '156', icon: 'users' as const },
   { label: 'Active Courses', value: '23', icon: 'book' as const },
-  { label: 'Pending Reviews', value: '5', icon: 'clock' as const },
   { label: 'Monthly Revenue', value: '$4,820', icon: 'money' as const },
-];
-
-const pendingReviews = [
-  { name: 'Ahmed Mohamed', initials: 'AM', course: 'Arabic Basics', amount: '$35' },
-  { name: 'Sara Ibrahim', initials: 'SI', course: 'Math Tutoring', amount: '$50' },
-  { name: 'Youssef Karim', initials: 'YK', course: 'Physics 101', amount: '$40' },
 ];
 
 /* ── Icons ── */
@@ -36,6 +32,19 @@ function StatIcon({ type }: { type: 'users' | 'book' | 'clock' | 'money' }) {
 }
 
 export default async function AdminDashboard() {
+  await requireRole([UserRole.ADMIN]);
+  const allPendingReviews = await BookingService.listForAdmin({
+    status: 'pending_review',
+    limit: 100,
+    offset: 0,
+  });
+  const pendingReviews = allPendingReviews.slice(0, 3);
+  const dynamicStats = [
+    ...stats.slice(0, 2),
+    { label: 'Pending Reviews', value: String(allPendingReviews.length), icon: 'clock' as const },
+    stats[2],
+  ];
+
   return (
     <>
       {/* ════════════════════════════════════════════════════════
@@ -67,7 +76,7 @@ export default async function AdminDashboard() {
           ════════════════════════════════════════════════════════ */}
       <section className="mb-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {stats.map((stat) => (
+          {dynamicStats.map((stat) => (
             <div
               key={stat.label}
               className="rounded-2xl bg-[var(--color-bg-white)] p-5 sm:p-6 shadow-[0_4px_24px_-4px_rgba(29,64,64,0.08)] border border-[var(--color-border-light)]"
@@ -102,28 +111,33 @@ export default async function AdminDashboard() {
           </div>
 
           <div className="space-y-4">
+            {pendingReviews.length === 0 && (
+              <div className="rounded-2xl bg-[var(--color-bg-white)] border border-[var(--color-border-light)] p-6 shadow-[0_4px_24px_-4px_rgba(29,64,64,0.06)]">
+                <p className="text-[var(--color-text-muted)]">No pending payment proofs need review right now.</p>
+              </div>
+            )}
             {pendingReviews.map((review) => (
               <div
-                key={review.name}
+                key={review.id}
                 className="rounded-2xl bg-[var(--color-bg-white)] border border-[var(--color-border-light)] border-s-4 border-s-[var(--color-accent)] p-5 sm:p-6 shadow-[0_4px_24px_-4px_rgba(29,64,64,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(29,64,64,0.1)] transition-shadow duration-200"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4 min-w-0">
                     {/* Avatar */}
                     <div className="shrink-0 w-12 h-12 rounded-xl bg-[var(--color-primary)] flex items-center justify-center text-sm font-bold text-[var(--color-text-on-primary)]">
-                      {review.initials}
+                      {review.student_name.slice(0, 2).toUpperCase()}
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] truncate">
-                        {review.name}
+                        {review.student_name}
                       </p>
                       <p className="text-sm text-[var(--color-text-muted)] mt-0.5">
-                        {review.course} &mdash; <span className="font-semibold text-[var(--color-accent)]">{review.amount}</span>
+                        {review.course_title} &mdash; <span className="font-semibold text-[var(--color-accent)]">{formatPrice(review.amount)}</span>
                       </p>
                     </div>
                   </div>
                   <Link
-                    href="/admin"
+                    href="/admin/bookings/pending-review"
                     className="shrink-0 rounded-lg bg-[var(--color-accent)] px-5 py-2 text-xs font-semibold text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)] transition-colors"
                   >
                     Review

@@ -18,6 +18,9 @@
 import type { PaymentGateway } from '@/lib/services/payments/PaymentGateway';
 import type { MeetingProvider } from '@/lib/services/meetings/MeetingProvider';
 import type { FileStorage } from '@/lib/storage/FileStorage';
+import { PaymobGateway } from '@/lib/services/payments/PaymobGateway';
+import { MockPaymentGateway } from '@/lib/services/payments/MockPaymentGateway';
+import { LocalDiskStorage } from '@/lib/storage/LocalDiskStorage';
 
 let paymentGateway: PaymentGateway | null = null;
 let meetingProvider: MeetingProvider | null = null;
@@ -32,7 +35,6 @@ let fileStorage: FileStorage | null = null;
 export function getPaymentGateway(): PaymentGateway {
   if (!paymentGateway) {
     if (process.env.PAYMOB_API_KEY) {
-      const { PaymobGateway } = require('@/lib/services/payments/PaymobGateway');
       paymentGateway = new PaymobGateway({
         apiKey: process.env.PAYMOB_API_KEY,
         integrationIds: {
@@ -45,7 +47,6 @@ export function getPaymentGateway(): PaymentGateway {
       });
       console.log('[composition] PaymentGateway: PaymobGateway (live)');
     } else {
-      const { MockPaymentGateway } = require('@/lib/services/payments/MockPaymentGateway');
       paymentGateway = new MockPaymentGateway();
       console.log('[composition] PaymentGateway: MockPaymentGateway (dev)');
     }
@@ -81,9 +82,10 @@ export function setMeetingProvider(provider: MeetingProvider): void {
  */
 export function getFileStorage(): FileStorage {
   if (!fileStorage) {
-    throw new Error(
-      'FileStorage is not wired yet. Implement LocalDiskStorage (Phase 4) and register it in lib/composition.ts.'
-    );
+    fileStorage = new LocalDiskStorage({
+      uploadsDir: process.env.UPLOADS_DIR,
+    });
+    console.log('[composition] FileStorage: LocalDiskStorage');
   }
   return fileStorage;
 }

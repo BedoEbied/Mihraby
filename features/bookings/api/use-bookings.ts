@@ -12,6 +12,7 @@ import type {
   BookingWithDetails,
   InitiateBookingDTO,
   ApiResponse,
+  SubmitInstapayProofDTO,
 } from '@/lib/types';
 import { useNotifications } from '@/lib/stores/notifications';
 
@@ -195,6 +196,42 @@ export function useCreateCheckoutSession() {
   });
 }
 
+export function useUploadPaymentProof(bookingId: number) {
+  const queryClient = useQueryClient();
+  const { addNotification } = useNotifications();
+
+  return useMutation<IBooking, Error, SubmitInstapayProofDTO & { file: File }>({
+    mutationFn: async ({ transaction_reference, file }) => {
+      const formData = new FormData();
+      formData.append('transaction_reference', transaction_reference);
+      formData.append('file', file);
+
+      const response = await apiClient.post<ApiResponse<IBooking>>(
+        `/api/bookings/${bookingId}/payment-proof`,
+        formData
+      );
+      return unwrap(response);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.detail(bookingId) });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.student });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.admin });
+      addNotification({
+        type: 'success',
+        title: 'Proof Uploaded',
+        message: 'Your InstaPay proof was submitted for admin review.',
+      });
+    },
+    onError: (error) => {
+      addNotification({
+        type: 'error',
+        title: 'Upload Failed',
+        message: error.message || 'Unable to upload payment proof',
+      });
+    },
+  });
+}
+
 /**
  * Poll booking payment status every 3 seconds.
  * Stops polling once status leaves 'pending_payment'.
@@ -248,6 +285,69 @@ export function useUpdateBookingStatus(bookingId: number) {
         type: 'error',
         title: 'Update Failed',
         message: error instanceof Error ? error.message : 'Unable to update booking',
+      });
+    },
+  });
+}
+
+export function useAdminApproveBooking() {
+  const queryClient = useQueryClient();
+  const { addNotification } = useNotifications();
+
+  return useMutation<IBooking, Error, number>({
+    mutationFn: async (bookingId) => {
+      const response = await apiClient.post<ApiResponse<IBooking>>(
+        `/api/admin/bookings/${bookingId}/approve`
+      );
+      return unwrap(response);
+    },
+    onSuccess: (booking) => {
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.admin });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.student });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.detail(booking.id) });
+      addNotification({
+        type: 'success',
+        title: 'Booking Approved',
+        message: 'The booking was confirmed successfully.',
+      });
+    },
+    onError: (error) => {
+      addNotification({
+        type: 'error',
+        title: 'Approval Failed',
+        message: error.message || 'Unable to approve booking',
+      });
+    },
+  });
+}
+
+export function useAdminRejectBooking() {
+  const queryClient = useQueryClient();
+  const { addNotification } = useNotifications();
+
+  return useMutation<IBooking, Error, { bookingId: number; reason: string }>({
+    mutationFn: async ({ bookingId, reason }) => {
+      const response = await apiClient.post<ApiResponse<IBooking>>(
+        `/api/admin/bookings/${bookingId}/reject`,
+        { reason }
+      );
+      return unwrap(response);
+    },
+    onSuccess: (booking) => {
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.admin });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.student });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.detail(booking.id) });
+      addNotification({
+        type: 'success',
+        title: 'Booking Rejected',
+        message: 'The booking was rejected and the slot was released.',
+      });
+    },
+    onError: (error) => {
+      addNotification({
+        type: 'error',
+        title: 'Rejection Failed',
+        message: error.message || 'Unable to reject booking',
       });
     },
   });

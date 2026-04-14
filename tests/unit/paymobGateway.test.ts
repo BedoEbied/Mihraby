@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import crypto from 'crypto';
 
 const HMAC_SECRET = 'test_hmac_secret_key';
@@ -12,7 +12,7 @@ function makeConfig() {
   };
 }
 
-function makeWebhookObj(overrides: Record<string, any> = {}) {
+function makeWebhookObj(overrides: Record<string, unknown> = {}) {
   return {
     amount_cents: 15000,
     created_at: '2026-04-12T12:00:00',
@@ -36,7 +36,7 @@ function makeWebhookObj(overrides: Record<string, any> = {}) {
   };
 }
 
-function computeHmac(obj: Record<string, any>): string {
+function computeHmac(obj: Record<string, unknown>): string {
   const concatenated = [
     obj.amount_cents, obj.created_at, obj.currency, obj.error_occured,
     obj.has_parent_transaction, obj.id, obj.integration_id, obj.is_3d_secure,
@@ -51,6 +51,10 @@ function computeHmac(obj: Record<string, any>): string {
 const { PaymobGateway } = await import('@/lib/services/payments/PaymobGateway');
 
 describe('PaymobGateway', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe('verifyWebhook', () => {
     it('returns true for valid HMAC', () => {
       const gateway = new PaymobGateway(makeConfig());
@@ -110,10 +114,51 @@ describe('PaymobGateway', () => {
   });
 
   describe('piasters conversion', () => {
-    it('converts amount_cents to EGP', () => {
+    it('converts booking amounts to piasters when creating checkout sessions', async () => {
       const gateway = new PaymobGateway(makeConfig());
-      const obj = makeWebhookObj({ amount_cents: 25050 });
-      expect(gateway.parseWebhookEvent({ obj }).amount).toBe(250.5);
+      const fetchMock = vi.fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ token: 'auth_token' }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ id: 987 }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ token: 'payment_key' }),
+        });
+      vi.stubGlobal('fetch', fetchMock);
+
+      await gateway.createCheckoutSession(
+        {
+          id: 42,
+          user_id: 7,
+          course_id: 10,
+          slot_id: 3,
+          payment_status: 'pending',
+          payment_method: 'paymob_card',
+          payment_id: null,
+          transaction_id: null,
+          amount: 250,
+          meeting_link: null,
+          meeting_id: null,
+          meeting_platform: 'zoom',
+          status: 'pending_payment',
+          booked_at: new Date('2026-04-12T12:00:00Z'),
+          cancelled_at: null,
+          instapay_reference: null,
+          payment_proof_path: null,
+          payment_proof_uploaded_at: null,
+          admin_notes: null,
+        },
+        { id: 7, email: 'student@example.com', name: 'Student Example' }
+      );
+
+      const registerOrderCall = fetchMock.mock.calls[1];
+      const payload = JSON.parse(registerOrderCall[1].body as string);
+      expect(payload.amount_cents).toBe(25000);
     });
   });
 });

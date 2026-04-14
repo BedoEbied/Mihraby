@@ -22,6 +22,24 @@ export const bookingIdSchema = z.object({
   id: z.coerce.number().int().min(1, 'Invalid booking ID'),
 });
 
+export const submitInstapayProofSchema = z.object({
+  transaction_reference: z
+    .string()
+    .trim()
+    .min(3, 'Transaction reference is required')
+    .max(255, 'Transaction reference is too long'),
+});
+
+export const rejectBookingSchema = z.object({
+  reason: z
+    .string()
+    .trim()
+    .min(3, 'Rejection reason is required')
+    .max(1000, 'Rejection reason is too long'),
+});
+
 export type InitiateBookingInput = z.infer<typeof initiateBookingSchema>;
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
 export type UpdateBookingStatusInput = z.infer<typeof updateBookingStatusSchema>;
+export type SubmitInstapayProofInput = z.infer<typeof submitInstapayProofSchema>;
+export type RejectBookingInput = z.infer<typeof rejectBookingSchema>;

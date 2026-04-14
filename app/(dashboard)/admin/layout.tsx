@@ -22,6 +22,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
                 Mihraby
               </Link>
               <div className="ms-4 sm:ms-10 flex gap-3 sm:gap-8 text-sm font-medium">
+                <Link href="/admin/bookings/pending-review" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors py-2 whitespace-nowrap">
+                  Reviews
+                </Link>
                 <Link href="/admin/users" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors py-2">
                   Users
                 </Link>

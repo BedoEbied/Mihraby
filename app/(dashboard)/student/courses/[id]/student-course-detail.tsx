@@ -72,8 +72,7 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
               }
             );
           } else {
-            // InstaPay — go to bookings page (pending_review)
-            router.push('/student/bookings');
+            router.push(`/student/bookings/${booking.id}/pay`);
           }
         },
       }

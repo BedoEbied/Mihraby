@@ -85,6 +85,7 @@ web_modules/
 # Next.js build output
 .next
 out
+uploads/
 
 # Ignore stray nested frontend under backend (if present)
 backend/frontend/
