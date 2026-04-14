@@ -199,8 +199,8 @@ export default function Home() {
                 Secure Payments
               </h3>
               <p className="mt-2 text-[var(--color-text-secondary)] leading-relaxed">
-                Pay with confidence via Paymob, Vodafone Cash, Fawry, or
-                InstaPay. Your transactions are always protected.
+                Pay securely with PayPal. Your transactions are always
+                protected.
               </p>
             </div>
 
@@ -217,7 +217,7 @@ export default function Home() {
                     Live One-on-One Sessions
                   </h3>
                   <p className="mt-2 text-[var(--color-text-secondary)] leading-relaxed max-w-lg">
-                    Every session is a private Zoom meeting between you and your tutor.
+                    Every session is a private online meeting between you and your tutor.
                     Get personalized attention, ask questions freely, and learn at your pace.
                   </p>
                 </div>
@@ -239,7 +239,7 @@ export default function Home() {
             Ready to Start<br />Learning<span className="text-[var(--color-accent)]">?</span>
           </h2>
           <p className="mt-5 text-lg text-[var(--color-text-secondary)] max-w-md mx-auto">
-            Join thousands of students finding the right tutors across Egypt.
+            Join thousands of students finding the right tutors.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
             <Link

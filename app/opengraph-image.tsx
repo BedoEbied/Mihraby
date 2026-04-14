@@ -37,7 +37,7 @@ export default function og() {
         </div>
         <div style={{ fontWeight: 700 }}>Learn live. One session at a time.</div>
         <div style={{ fontSize: 28, color: '#1f2937', maxWidth: 700, lineHeight: 1.3 }}>
-          Book one-on-one sessions with expert tutors in Egypt.
+          Book one-on-one sessions with expert tutors.
         </div>
       </div>
     ),

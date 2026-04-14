@@ -19,6 +19,7 @@ import type { PaymentGateway } from '@/lib/services/payments/PaymentGateway';
 import type { MeetingProvider } from '@/lib/services/meetings/MeetingProvider';
 import type { FileStorage } from '@/lib/storage/FileStorage';
 import { PaymobGateway } from '@/lib/services/payments/PaymobGateway';
+import { PayPalGateway } from '@/lib/services/payments/PayPalGateway';
 import { MockPaymentGateway } from '@/lib/services/payments/MockPaymentGateway';
 import { LocalDiskStorage } from '@/lib/storage/LocalDiskStorage';
 
@@ -29,12 +30,23 @@ let fileStorage: FileStorage | null = null;
 /**
  * Returns the active payment gateway for the current environment.
  *
- * When PAYMOB_API_KEY is set, uses the live PaymobGateway.
- * Otherwise falls back to MockPaymentGateway for local development.
+ * Selection order (US launch):
+ *   1. PAYPAL_CLIENT_ID + PAYPAL_CLIENT_SECRET set → PayPalGateway (US/USD)
+ *   2. PAYMOB_API_KEY set → PaymobGateway (legacy Egypt flow, dormant at launch)
+ *   3. otherwise → MockPaymentGateway (local dev)
  */
 export function getPaymentGateway(): PaymentGateway {
   if (!paymentGateway) {
-    if (process.env.PAYMOB_API_KEY) {
+    if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
+      const env = (process.env.PAYPAL_ENV ?? 'sandbox') as 'sandbox' | 'live';
+      paymentGateway = new PayPalGateway({
+        clientId: process.env.PAYPAL_CLIENT_ID,
+        clientSecret: process.env.PAYPAL_CLIENT_SECRET,
+        environment: env,
+        appUrl: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
+      });
+      console.log(`[composition] PaymentGateway: PayPalGateway (${env})`);
+    } else if (process.env.PAYMOB_API_KEY) {
       paymentGateway = new PaymobGateway({
         apiKey: process.env.PAYMOB_API_KEY,
         integrationIds: {
@@ -45,7 +57,7 @@ export function getPaymentGateway(): PaymentGateway {
         iframeId: process.env.PAYMOB_IFRAME_ID!,
         hmacSecret: process.env.PAYMOB_HMAC_SECRET!,
       });
-      console.log('[composition] PaymentGateway: PaymobGateway (live)');
+      console.log('[composition] PaymentGateway: PaymobGateway (legacy)');
     } else {
       paymentGateway = new MockPaymentGateway();
       console.log('[composition] PaymentGateway: MockPaymentGateway (dev)');

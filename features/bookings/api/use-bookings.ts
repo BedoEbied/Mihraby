@@ -179,9 +179,6 @@ export function useCancelBooking() {
 }
 
 /**
- * Update booking status (instructor/admin only).
- */
-/**
  * Create a Paymob checkout session and get redirect URL.
  */
 export function useCreateCheckoutSession() {
@@ -192,6 +189,43 @@ export function useCreateCheckoutSession() {
         { payment_method: paymentMethod }
       );
       return unwrap(response);
+    },
+  });
+}
+
+/**
+ * Initiate a PayPal hosted-checkout order. Returns the approve URL the
+ * student should be redirected to and the PayPal order id (token) we'll
+ * see again on the /return page.
+ */
+export function useInitiatePaypalCheckout() {
+  return useMutation<{ redirectUrl: string; orderId: string }, Error, number>({
+    mutationFn: async (bookingId) => {
+      const response = await apiClient.post<ApiResponse<{ redirectUrl: string; orderId: string }>>(
+        `/api/bookings/${bookingId}/pay/paypal`,
+        {}
+      );
+      return unwrap(response);
+    },
+  });
+}
+
+/**
+ * Capture an approved PayPal order on /return.
+ */
+export function useCapturePaypalOrder(bookingId: number) {
+  const queryClient = useQueryClient();
+  return useMutation<IBooking, Error, string>({
+    mutationFn: async (orderId) => {
+      const response = await apiClient.post<ApiResponse<{ booking: IBooking }>>(
+        `/api/bookings/${bookingId}/capture/paypal`,
+        { orderId }
+      );
+      return unwrap(response).booking;
+    },
+    onSuccess: (booking) => {
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.detail(booking.id) });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEYS.student });
     },
   });
 }

@@ -25,8 +25,9 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   title: "Mihraby - Tutor Booking Platform",
-  description: "Book one-on-one tutoring sessions with expert instructors on Mihraby.",
+  description: "Book one-on-one tutoring sessions with expert instructors. Secure checkout powered by PayPal.",
 };
 
 export default function RootLayout({

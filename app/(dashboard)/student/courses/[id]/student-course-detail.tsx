@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { courseApi } from '@/lib/api';
 import { SlotPicker } from '@/features/time-slots';
 import { useAvailableSlots } from '@/features/time-slots/api';
-import { useInitiateBooking, useCreateCheckoutSession } from '@/features/bookings/api';
+import { useInitiateBooking } from '@/features/bookings/api';
 import type { ITimeSlot, PaymentMethod } from '@/lib/types';
 import { formatPrice } from '@/lib/format';
 
@@ -26,16 +26,13 @@ type CourseData = {
 };
 
 const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [
-  { value: 'paymob_card', label: 'Credit / Debit Card' },
-  { value: 'paymob_wallet', label: 'Vodafone Cash' },
-  { value: 'paymob_fawry', label: 'Fawry' },
-  { value: 'instapay', label: 'InstaPay (manual transfer)' },
+  { value: 'paypal', label: 'PayPal' },
 ];
 
 export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
   const router = useRouter();
   const [selectedSlot, setSelectedSlot] = useState<ITimeSlot | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paymob_card');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('paypal');
 
   const { data: courseRes, isLoading: courseLoading, error: courseError } = useQuery({
     queryKey: ['student-course', courseId],
@@ -54,7 +51,6 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
 
   const { data: slots = [], isLoading: slotsLoading } = useAvailableSlots(courseId);
   const initiate = useInitiateBooking();
-  const checkout = useCreateCheckoutSession();
 
   const handleBook = () => {
     if (!selectedSlot) return;
@@ -62,18 +58,9 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
       { slot_id: selectedSlot.id, payment_method: paymentMethod },
       {
         onSuccess: (booking) => {
-          if (paymentMethod.startsWith('paymob_')) {
-            checkout.mutate(
-              { bookingId: booking.id, paymentMethod },
-              {
-                onSuccess: ({ redirectUrl }) => {
-                  window.location.href = redirectUrl;
-                },
-              }
-            );
-          } else {
-            router.push(`/student/bookings/${booking.id}/pay`);
-          }
+          // PayPal hosted-checkout is the only launch path. The /pay page
+          // initiates the order and redirects to PayPal's approve URL.
+          router.push(`/student/bookings/${booking.id}/pay`);
         },
       }
     );
@@ -141,10 +128,10 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
             <button
               type="button"
               onClick={handleBook}
-              disabled={initiate.isPending || checkout.isPending}
+              disabled={initiate.isPending}
               className="rounded-lg bg-[var(--color-accent)] px-6 py-2.5 text-sm font-medium text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)] disabled:opacity-50"
             >
-              {initiate.isPending || checkout.isPending ? 'Processing...' : `Book for ${formatPrice(price)}`}
+              {initiate.isPending ? 'Processing...' : `Book for ${formatPrice(price)}`}
             </button>
             {initiate.isError && (
               <p className="text-sm text-[var(--color-error)]">Booking failed. Please try again.</p>

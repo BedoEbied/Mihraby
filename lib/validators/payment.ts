@@ -7,3 +7,9 @@ export const createCheckoutSchema = z.object({
 });
 
 export type CreateCheckoutInput = z.infer<typeof createCheckoutSchema>;
+
+export const capturePaypalSchema = z.object({
+  orderId: z.string().min(1, 'orderId is required'),
+});
+
+export type CapturePaypalInput = z.infer<typeof capturePaypalSchema>;
