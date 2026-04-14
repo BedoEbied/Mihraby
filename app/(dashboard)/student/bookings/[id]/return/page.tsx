@@ -48,15 +48,17 @@ export default function BookingReturnPage({
   if (orderId) {
     if (state === 'capturing' || state === 'idle') {
       return (
-        <Spinner label="Confirming your PayPal payment..." />
+        <Spinner label="Confirming your payment with PayPal…" />
       );
     }
 
     if (state === 'confirmed') {
       return (
-        <Card tone="success" title="Booking confirmed!">
-          <p className="mt-2 text-[var(--color-success)]">
-            Your session is booked. Your instructor will contact you with the meeting details shortly.
+        <Card tone="success" title="Session confirmed — barakAllāhu fīk">
+          <p className="mt-2 text-[var(--color-text-secondary)]">
+            Your booking is confirmed. Your teacher will contact you by email with
+            the meeting link and any preparation materials before the session starts.
+            You can also track this session in your bookings list.
           </p>
           <CtaLink href="/student/bookings">View my bookings</CtaLink>
         </Card>
@@ -64,7 +66,7 @@ export default function BookingReturnPage({
     }
 
     return (
-      <Card tone="error" title="Payment couldn't be confirmed">
+      <Card tone="error" title="We couldn’t confirm your payment">
         <p className="mt-2 text-[var(--color-text-secondary)]">
           {errorMsg ?? "We couldn't capture your PayPal payment. You can retry from the booking page."}
         </p>
@@ -77,43 +79,44 @@ export default function BookingReturnPage({
   const data = polling.data;
 
   if (polling.isLoading || !data) {
-    return <Spinner label="Verifying your payment..." />;
+    return <Spinner label="Verifying your payment…" />;
   }
 
   if (polling.error) {
     return (
-      <Card tone="error" title="Couldn't verify your payment">
+      <Card tone="error" title="We couldn’t verify your payment">
         <p className="text-[var(--color-text-secondary)]">
-          We couldn&apos;t verify your payment. Your booking may still be processing.
+          Your booking may still be processing. You can check its status from your bookings list.
         </p>
-        <CtaLink href="/student/bookings">Go to my bookings</CtaLink>
+        <CtaLink href="/student/bookings">View my bookings</CtaLink>
       </Card>
     );
   }
 
   if (data.status === 'confirmed') {
     return (
-      <Card tone="success" title="Payment Successful!">
-        <p className="mt-2 text-[var(--color-success)]">
-          Your session is booked. Your instructor will share the meeting details before it starts.
+      <Card tone="success" title="Session confirmed — barakAllāhu fīk">
+        <p className="mt-2 text-[var(--color-text-secondary)]">
+          Your booking is confirmed. Your teacher will share the meeting details
+          before the session begins. You can check your bookings at any time.
         </p>
-        <CtaLink href="/student/bookings">View My Bookings</CtaLink>
+        <CtaLink href="/student/bookings">View my bookings</CtaLink>
       </Card>
     );
   }
 
   if (data.status === 'cancelled') {
     return (
-      <Card tone="error" title="Payment Not Completed">
+      <Card tone="error" title="Payment not completed">
         <p className="mt-2 text-[var(--color-text-secondary)]">
-          The payment was not completed. You can try booking again.
+          The payment wasn’t completed, so your session was not booked. You can try again whenever you’re ready.
         </p>
-        <CtaLink href="/student/courses">Browse Courses</CtaLink>
+        <CtaLink href="/student/courses">Find a Teacher</CtaLink>
       </Card>
     );
   }
 
-  return <Spinner label="Verifying your payment..." />;
+  return <Spinner label="Verifying your payment…" />;
 }
 
 function Spinner({ label }: { label: string }) {

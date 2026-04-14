@@ -1,3 +1,6 @@
+# Claude Code superpowers plugin state
+.superpowers/
+
 # Logs
 logs
 *.log

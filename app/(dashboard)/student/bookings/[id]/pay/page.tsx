@@ -41,25 +41,26 @@ export default function StudentPayPage({
   }, [bookingId, booking, cancelled, initiate, redirected]);
 
   if (bookingLoading) {
-    return <Spinner label="Loading booking..." />;
+    return <Spinner label="Loading your booking…" />;
   }
 
   if (!booking) {
     return (
       <Card tone="error" title="Booking not found">
         <p className="text-[var(--color-text-secondary)]">
-          We couldn&apos;t find a booking with that id.
+          We couldn&apos;t find that booking. It may have expired or been cancelled.
         </p>
-        <CtaLink href="/student/bookings">Go to my bookings</CtaLink>
+        <CtaLink href="/student/bookings">View my bookings</CtaLink>
       </Card>
     );
   }
 
   if (booking.status === 'confirmed') {
     return (
-      <Card tone="success" title="Already paid">
+      <Card tone="success" title="Session already confirmed">
         <p className="text-[var(--color-text-secondary)]">
-          This booking is already confirmed.
+          This booking is already paid and confirmed. Your teacher will be in
+          touch with the meeting details.
         </p>
         <CtaLink href="/student/bookings">View my bookings</CtaLink>
       </Card>
@@ -68,11 +69,11 @@ export default function StudentPayPage({
 
   if (booking.status !== 'pending_payment') {
     return (
-      <Card tone="error" title="Cannot pay for this booking">
+      <Card tone="error" title="This booking can no longer be paid">
         <p className="text-[var(--color-text-secondary)]">
-          This booking is in status &quot;{booking.status}&quot; and can no longer be paid.
+          The booking is currently &quot;{booking.status}&quot; and is no longer awaiting payment.
         </p>
-        <CtaLink href="/student/bookings">Go to my bookings</CtaLink>
+        <CtaLink href="/student/bookings">View my bookings</CtaLink>
       </Card>
     );
   }
@@ -81,7 +82,8 @@ export default function StudentPayPage({
     return (
       <Card tone="error" title="Payment cancelled">
         <p className="text-[var(--color-text-secondary)]">
-          You cancelled the PayPal checkout. You can retry below.
+          Your time slot is still held for a few minutes. Retry the payment below
+          to confirm your session.
         </p>
         <button
           type="button"
@@ -98,7 +100,7 @@ export default function StudentPayPage({
           }}
           className="mt-4 inline-block rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)]"
         >
-          Retry PayPal
+          Return to PayPal
         </button>
       </Card>
     );
@@ -106,7 +108,7 @@ export default function StudentPayPage({
 
   if (error) {
     return (
-      <Card tone="error" title="Couldn't start PayPal checkout">
+      <Card tone="error" title="We couldn’t start your PayPal checkout">
         <p className="text-[var(--color-text-secondary)]">{error}</p>
         <button
           type="button"
@@ -129,7 +131,7 @@ export default function StudentPayPage({
     );
   }
 
-  return <Spinner label="Redirecting to PayPal..." />;
+  return <Spinner label="Redirecting you to PayPal to confirm your session…" />;
 }
 
 function Spinner({ label }: { label: string }) {

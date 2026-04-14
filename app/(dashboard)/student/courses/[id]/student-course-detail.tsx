@@ -92,7 +92,7 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
       </div>
 
       <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-white)] p-6 shadow-[var(--shadow-sm)]">
-        <h3 className="text-lg font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] mb-3">1. Pick a time</h3>
+        <h3 className="text-lg font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] mb-3">1. Choose a time</h3>
         {slotsLoading ? (
           <p className="text-sm text-[var(--color-text-muted)]">Loading slots...</p>
         ) : (
@@ -107,7 +107,7 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
 
       {selectedSlot && (
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-white)] p-6 shadow-[var(--shadow-sm)]">
-          <h3 className="text-lg font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] mb-3">2. Payment method</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)] mb-3">2. Confirm payment</h3>
           <div className="space-y-2">
             {PAYMENT_METHODS.map((pm) => (
               <label key={pm.value} className="flex items-center gap-3 cursor-pointer">
@@ -131,10 +131,10 @@ export function StudentCourseDetail({ courseId }: StudentCourseDetailProps) {
               disabled={initiate.isPending}
               className="rounded-lg bg-[var(--color-accent)] px-6 py-2.5 text-sm font-medium text-[var(--color-text-on-accent)] hover:bg-[var(--color-accent-light)] disabled:opacity-50"
             >
-              {initiate.isPending ? 'Processing...' : `Book for ${formatPrice(price)}`}
+              {initiate.isPending ? 'Reserving your slot…' : `Book this session · ${formatPrice(price)}`}
             </button>
             {initiate.isError && (
-              <p className="text-sm text-[var(--color-error)]">Booking failed. Please try again.</p>
+              <p className="text-sm text-[var(--color-error)]">We couldn’t reserve that time slot. Please try another or try again.</p>
             )}
           </div>
         </div>
