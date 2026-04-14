@@ -140,6 +140,8 @@ describe('PayPalGateway.captureOrder', () => {
           status: 'COMPLETED',
           purchase_units: [
             {
+              reference_id: '42',
+              custom_id: '42',
               payments: {
                 captures: [
                   {
@@ -163,7 +165,71 @@ describe('PayPalGateway.captureOrder', () => {
     expect(result.amount).toBe(15.5);
   });
 
-  it('treats ORDER_ALREADY_CAPTURED as success (idempotent)', async () => {
+  it('rejects capture when purchase_unit reference_id/custom_id does not match bookingId (cross-booking replay)', async () => {
+    mockFetchSequence([
+      { ok: true, body: { access_token: 'T', expires_in: 3600 } },
+      {
+        ok: true,
+        body: {
+          id: 'ORDER_001',
+          status: 'COMPLETED',
+          purchase_units: [
+            {
+              reference_id: '999',
+              custom_id: '999',
+              payments: {
+                captures: [
+                  {
+                    id: 'CAPTURE_ABC',
+                    status: 'COMPLETED',
+                    amount: { currency_code: 'USD', value: '15.50' },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
+    const gateway = makeGateway();
+    await expect(gateway.captureOrder('ORDER_001', 42)).rejects.toThrow(
+      /reference_id\/custom_id mismatch/
+    );
+  });
+
+  it('rejects capture when currency is not USD', async () => {
+    mockFetchSequence([
+      { ok: true, body: { access_token: 'T', expires_in: 3600 } },
+      {
+        ok: true,
+        body: {
+          id: 'ORDER_001',
+          status: 'COMPLETED',
+          purchase_units: [
+            {
+              reference_id: '42',
+              custom_id: '42',
+              payments: {
+                captures: [
+                  {
+                    id: 'CAPTURE_ABC',
+                    status: 'COMPLETED',
+                    amount: { currency_code: 'EUR', value: '15.50' },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
+    const gateway = makeGateway();
+    await expect(gateway.captureOrder('ORDER_001', 42)).rejects.toThrow(/currency mismatch/);
+  });
+
+  it('on ORDER_ALREADY_CAPTURED, re-fetches the order and returns real capture id + amount', async () => {
     mockFetchSequence([
       { ok: true, body: { access_token: 'T', expires_in: 3600 } },
       {
@@ -175,13 +241,80 @@ describe('PayPalGateway.captureOrder', () => {
           details: [{ issue: 'ORDER_ALREADY_CAPTURED', description: 'Order already captured' }],
         },
       },
+      {
+        ok: true,
+        body: {
+          id: 'ORDER_001',
+          status: 'COMPLETED',
+          purchase_units: [
+            {
+              reference_id: '42',
+              custom_id: '42',
+              payments: {
+                captures: [
+                  {
+                    id: 'CAPTURE_REAL',
+                    status: 'COMPLETED',
+                    amount: { currency_code: 'USD', value: '15.50' },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
     ]);
 
     const gateway = makeGateway();
     const result = await gateway.captureOrder('ORDER_001', 42);
 
+    // Must return the real capture id, NOT the orderId. This is critical for
+    // the UNIQUE(transaction_id) DB constraint to catch replays.
     expect(result.success).toBe(true);
-    expect(result.transactionId).toBe('ORDER_001');
+    expect(result.transactionId).toBe('CAPTURE_REAL');
+    expect(result.amount).toBe(15.5);
+  });
+
+  it('on ORDER_ALREADY_CAPTURED, rejects when the re-fetched order is bound to a different bookingId', async () => {
+    mockFetchSequence([
+      { ok: true, body: { access_token: 'T', expires_in: 3600 } },
+      {
+        ok: false,
+        status: 422,
+        body: {
+          name: 'UNPROCESSABLE_ENTITY',
+          message: 'Order already captured',
+          details: [{ issue: 'ORDER_ALREADY_CAPTURED' }],
+        },
+      },
+      {
+        ok: true,
+        body: {
+          id: 'ORDER_001',
+          status: 'COMPLETED',
+          purchase_units: [
+            {
+              reference_id: '7',
+              custom_id: '7',
+              payments: {
+                captures: [
+                  {
+                    id: 'CAPTURE_FROM_BOOKING_7',
+                    status: 'COMPLETED',
+                    amount: { currency_code: 'USD', value: '5.00' },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
+    const gateway = makeGateway();
+    await expect(gateway.captureOrder('ORDER_001', 42)).rejects.toThrow(
+      /reference_id\/custom_id mismatch/
+    );
   });
 
   it('throws on INSTRUMENT_DECLINED', async () => {

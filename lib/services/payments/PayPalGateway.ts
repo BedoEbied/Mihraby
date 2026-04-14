@@ -26,18 +26,29 @@ interface PayPalOrderResponse {
   links: PayPalLink[];
 }
 
+interface PayPalPurchaseUnit {
+  reference_id?: string;
+  custom_id?: string;
+  payments?: {
+    captures?: Array<{
+      id: string;
+      status: string;
+      amount: { currency_code: string; value: string };
+      custom_id?: string;
+    }>;
+  };
+}
+
 interface PayPalCaptureResponse {
   id: string;
   status: string;
-  purchase_units: Array<{
-    payments?: {
-      captures?: Array<{
-        id: string;
-        status: string;
-        amount: { currency_code: string; value: string };
-      }>;
-    };
-  }>;
+  purchase_units: PayPalPurchaseUnit[];
+}
+
+interface PayPalOrderDetailResponse {
+  id: string;
+  status: string;
+  purchase_units: PayPalPurchaseUnit[];
 }
 
 interface PayPalErrorResponse {
@@ -136,7 +147,7 @@ export class PayPalGateway implements PaymentGateway {
     };
   }
 
-  async captureOrder(orderId: string, _bookingId: number): Promise<CaptureResult> {
+  async captureOrder(orderId: string, bookingId: number): Promise<CaptureResult> {
     const accessToken = await this.authenticate();
 
     const res = await fetch(`${this.apiBase}/v2/checkout/orders/${orderId}/capture`, {
@@ -153,14 +164,14 @@ export class PayPalGateway implements PaymentGateway {
       const err = body as PayPalErrorResponse;
       const issue = err.details?.[0]?.issue ?? err.name ?? '';
 
-      // Idempotency: PayPal rejects duplicate capture attempts. Treat as success.
+      // Idempotent replay: PayPal rejects duplicate capture attempts. Instead
+      // of trusting the error body, re-fetch the order and return the real
+      // capture details (id + amount) after verifying reference_id matches
+      // the target bookingId. This closes the cross-booking order-ID replay
+      // path: a student cannot confirm booking B by replaying booking A's
+      // already-captured order id.
       if (issue === 'ORDER_ALREADY_CAPTURED') {
-        return {
-          success: true,
-          transactionId: orderId,
-          amount: 0,
-          raw: body,
-        };
+        return this.fetchExistingCapture(orderId, bookingId, accessToken);
       }
 
       throw new Error(
@@ -169,7 +180,8 @@ export class PayPalGateway implements PaymentGateway {
     }
 
     const capture = body as PayPalCaptureResponse;
-    const firstCapture = capture.purchase_units?.[0]?.payments?.captures?.[0];
+    const unit = capture.purchase_units?.[0];
+    const firstCapture = unit?.payments?.captures?.[0];
 
     if (!firstCapture || firstCapture.status !== 'COMPLETED') {
       throw new Error(
@@ -177,12 +189,83 @@ export class PayPalGateway implements PaymentGateway {
       );
     }
 
+    this.assertCaptureBinding(unit, firstCapture.amount.currency_code, bookingId);
+
     return {
       success: true,
       transactionId: firstCapture.id,
       amount: Number(firstCapture.amount.value),
       raw: body,
     };
+  }
+
+  /**
+   * Idempotent replay path: the order was already captured (possibly from a
+   * previous /return-page retry). Fetch the order to recover the real capture
+   * id and amount, and verify the stored reference_id/custom_id matches the
+   * target bookingId so a student cannot confirm one booking using another
+   * booking's order id.
+   */
+  private async fetchExistingCapture(
+    orderId: string,
+    bookingId: number,
+    accessToken: string
+  ): Promise<CaptureResult> {
+    const res = await fetch(`${this.apiBase}/v2/checkout/orders/${orderId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(
+        `PayPal order fetch failed after ORDER_ALREADY_CAPTURED (${res.status})`
+      );
+    }
+
+    const order = body as PayPalOrderDetailResponse;
+    const unit = order.purchase_units?.[0];
+    const firstCapture = unit?.payments?.captures?.[0];
+
+    if (!firstCapture || firstCapture.status !== 'COMPLETED') {
+      throw new Error(
+        `PayPal order lookup returned non-COMPLETED capture status: ${firstCapture?.status ?? 'missing'}`
+      );
+    }
+
+    this.assertCaptureBinding(unit, firstCapture.amount.currency_code, bookingId);
+
+    return {
+      success: true,
+      transactionId: firstCapture.id,
+      amount: Number(firstCapture.amount.value),
+      raw: body,
+    };
+  }
+
+  private assertCaptureBinding(
+    unit: PayPalPurchaseUnit | undefined,
+    currencyCode: string,
+    bookingId: number
+  ): void {
+    const expected = String(bookingId);
+    const refId = unit?.reference_id;
+    const customId = unit?.custom_id ?? unit?.payments?.captures?.[0]?.custom_id;
+
+    if (refId !== expected && customId !== expected) {
+      throw new Error(
+        `PayPal capture reference_id/custom_id mismatch: expected '${expected}', got reference_id='${refId ?? ''}' custom_id='${customId ?? ''}'`
+      );
+    }
+
+    if (currencyCode !== 'USD') {
+      throw new Error(
+        `PayPal capture currency mismatch: expected 'USD', got '${currencyCode}'`
+      );
+    }
   }
 
   verifyWebhook(

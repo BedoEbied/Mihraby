@@ -30,13 +30,39 @@ async function handler(
     }
 
     // Belt-and-braces idempotency: PayPal capture itself is idempotent (we
-    // map ORDER_ALREADY_CAPTURED → success), but short-circuiting here saves
-    // a network round-trip on retries from the return page.
+    // map ORDER_ALREADY_CAPTURED → re-fetched capture), but short-circuiting
+    // here saves a network round-trip on retries from the return page.
     if (existing.status === 'confirmed') {
       return NextResponse.json<ApiResponse<{ booking: IBooking }>>({
         success: true,
         data: { booking: existing },
       });
+    }
+
+    // The orderId submitted from /return MUST match the one we stamped on
+    // this booking at checkout initiation. Without this check, a student
+    // could confirm an expensive booking by replaying a cheap booking's
+    // PayPal order id.
+    if (existing.payment_method !== 'paypal') {
+      throw new ApiError(
+        `Booking is not a PayPal booking (payment_method='${existing.payment_method}')`,
+        400,
+        ApiErrorCode.VALIDATION_ERROR
+      );
+    }
+    if (existing.status !== 'pending_payment') {
+      throw new ApiError(
+        `Cannot capture a booking with status '${existing.status}'`,
+        400,
+        ApiErrorCode.VALIDATION_ERROR
+      );
+    }
+    if (!existing.payment_id || existing.payment_id !== orderId) {
+      throw new ApiError(
+        'PayPal order id does not match this booking',
+        403,
+        ApiErrorCode.FORBIDDEN
+      );
     }
 
     const gateway = getPaymentGateway();
@@ -51,6 +77,20 @@ async function handler(
     const result = await gateway.captureOrder(orderId, bookingId);
     if (!result.success) {
       throw new ApiError('PayPal capture did not succeed', 502, ApiErrorCode.SERVER_ERROR);
+    }
+
+    // Amount parity check: compare in cents to avoid float drift. If PayPal
+    // captured a different amount than the booking's quoted price, refuse
+    // to confirm — the booking stays pending_payment and an operator can
+    // investigate / refund via the PayPal dashboard.
+    const expectedCents = Math.round(Number(existing.amount) * 100);
+    const capturedCents = Math.round(result.amount * 100);
+    if (expectedCents !== capturedCents) {
+      throw new ApiError(
+        `PayPal captured amount (${result.amount}) does not match booking amount (${existing.amount})`,
+        502,
+        ApiErrorCode.SERVER_ERROR
+      );
     }
 
     const confirmed = await BookingService.confirmBooking(bookingId, {
