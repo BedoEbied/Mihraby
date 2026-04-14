@@ -37,7 +37,19 @@ export class CourseService {
    * Create new course
    */
   static async createCourse(instructorId: number, data: CreateCourseDTO): Promise<ICourse> {
+    CourseService.assertManualMeetingPlatform(data);
     return await Course.create(data, instructorId);
+  }
+
+  /**
+   * US launch guard: only manual meeting platforms are supported today.
+   * Zoom / Google Meet automation is deferred — this prevents a Zoom course
+   * from reaching confirmBooking and crashing at meeting-creation time.
+   */
+  private static assertManualMeetingPlatform(data: { meeting_platform?: string }) {
+    if (data.meeting_platform && data.meeting_platform !== 'manual') {
+      throw new Error("Only 'manual' meeting_platform is supported at launch");
+    }
   }
 
   /**
@@ -59,6 +71,8 @@ export class CourseService {
     if (course.instructor_id !== userId && userRole !== UserRole.ADMIN) {
       throw new Error('Not authorized to update this course');
     }
+
+    CourseService.assertManualMeetingPlatform(data);
 
     const isUpdated = await Course.update(courseId, data);
     if (!isUpdated) {

@@ -35,9 +35,9 @@ export default function og() {
         >
           Mihraby
         </div>
-        <div style={{ fontWeight: 700 }}>Learn live. One session at a time.</div>
+        <div style={{ fontWeight: 700 }}>Empower your mind. Enrich your soul.</div>
         <div style={{ fontSize: 28, color: '#1f2937', maxWidth: 700, lineHeight: 1.3 }}>
-          Book one-on-one sessions with expert tutors in Egypt.
+          Private one-on-one sessions in Qur&apos;an, Tajwīd, Nazirah, and English.
         </div>
       </div>
     ),

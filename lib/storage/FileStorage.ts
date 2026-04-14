@@ -11,7 +11,7 @@ import type { Readable } from 'node:stream';
  * `save()` and passed to the other methods.
  */
 export interface FileStorage {
-  readonly name: 'local-disk' | 'r2' | 's3';
+  readonly name: 'local-disk' | 'r2' | 's3' | 'disabled';
 
   /**
    * Persist a file uploaded via multipart/form-data. Returns the object key

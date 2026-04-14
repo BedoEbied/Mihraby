@@ -33,7 +33,7 @@ export default function Home() {
                 href="/courses"
                 className="hidden sm:inline-block text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] text-sm font-medium transition-colors"
               >
-                Browse Tutors
+                Find a Teacher
               </Link>
               <Link
                 href="/login"
@@ -66,23 +66,22 @@ export default function Home() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 sm:pt-28 sm:pb-40 lg:pt-36 lg:pb-48">
           <div className="max-w-3xl">
             <p className="text-xs sm:text-sm font-medium tracking-[0.2em] uppercase text-[var(--color-accent)] mb-4">
-              One-on-one tutoring platform
+              Private one-on-one learning
             </p>
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight font-[family-name:var(--font-heading)] leading-[0.92]">
               <span className="text-[var(--color-text-on-primary)]">
-                Find Your
+                Empower your mind.
               </span>
               <br />
-              <span className="text-[var(--color-text-on-primary)]">
-                Perfect{" "}
+              <span className="text-[var(--color-accent)]">
+                Enrich your soul
               </span>
-              <span className="text-[var(--color-accent)]">Tutor</span>
               <span className="text-[var(--color-accent)]">.</span>
             </h1>
 
             <p className="mt-6 sm:mt-8 max-w-xl text-base sm:text-lg lg:text-xl text-[var(--color-surface)]/80 leading-relaxed">
-              Expert instructors, flexible scheduling, live sessions.
-              Browse courses, pick a time, and start learning.
+              Study the Qur&apos;an, Tajwīd, and English with qualified teachers —
+              one-on-one, at a pace that works for you.
             </p>
 
             {/* CTA buttons */}
@@ -91,7 +90,7 @@ export default function Home() {
                 href="/courses"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-base font-semibold text-[var(--color-text-on-accent)] bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] shadow-[0_8px_30px_-4px_rgba(212,146,10,0.5)] hover:shadow-[0_12px_40px_-4px_rgba(212,146,10,0.6)] transition-[background-color,box-shadow] duration-200"
               >
-                Browse Tutors
+                Find a Teacher
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
@@ -105,21 +104,19 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Trust bar — positioned to the right on desktop */}
-          <div className="mt-16 sm:mt-20 flex flex-wrap gap-8 sm:gap-12">
+          {/* Subject chips — what we teach */}
+          <div className="mt-16 sm:mt-20 flex flex-wrap gap-3">
             {[
-              { value: '1,200+', label: 'Students' },
-              { value: '500+', label: 'Tutors' },
-              { value: '4.9', label: 'Avg Rating' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-2xl sm:text-3xl font-bold text-[var(--color-accent)] font-[family-name:var(--font-heading)] tabular-nums">
-                  {stat.value}
-                </p>
-                <p className="text-sm text-[var(--color-surface)]/60 mt-0.5">
-                  {stat.label}
-                </p>
-              </div>
+              'Qur\u2019an & Tajwīd',
+              'Nazirah',
+              'English Language',
+            ].map((subject) => (
+              <span
+                key={subject}
+                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30"
+              >
+                {subject}
+              </span>
             ))}
           </div>
         </div>
@@ -142,7 +139,7 @@ export default function Home() {
               Why Mihraby
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--color-text)] font-[family-name:var(--font-heading)] leading-tight">
-              Learning,<br />Reimagined<span className="text-[var(--color-accent)]">.</span>
+              Classical learning,<br />delivered live<span className="text-[var(--color-accent)]">.</span>
             </h2>
           </div>
 
@@ -160,12 +157,12 @@ export default function Home() {
                   </svg>
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-bold text-[var(--color-text-on-primary)] font-[family-name:var(--font-heading)] leading-tight">
-                  Expert Tutors
+                  Qualified Teachers
                 </h3>
                 <p className="mt-3 text-[var(--color-surface)]/70 leading-relaxed max-w-lg">
-                  Learn from carefully vetted instructors who are passionate about
-                  their subjects and dedicated to your success. Every tutor goes
-                  through our quality review process.
+                  Study with teachers carefully vetted for subject mastery and
+                  teaching experience — including ijāzah-holders in the ten Qirā&apos;āt
+                  and native English speakers with years of classroom experience.
                 </p>
               </div>
             </div>
@@ -179,11 +176,11 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)]">
-                Flexible Scheduling
+                Study on Your Schedule
               </h3>
               <p className="mt-2 text-[var(--color-text-secondary)] leading-relaxed">
-                Book sessions that fit your life. Browse available time slots
-                and pick the ones that work for you.
+                Pick a time that works for you — evenings, weekends, or between
+                commitments. Your teacher holds the slot as soon as you book.
               </p>
             </div>
 
@@ -196,11 +193,11 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)]">
-                Secure Payments
+                Simple, Secure Checkout
               </h3>
               <p className="mt-2 text-[var(--color-text-secondary)] leading-relaxed">
-                Pay with confidence via Paymob, Vodafone Cash, Fawry, or
-                InstaPay. Your transactions are always protected.
+                Pay in USD with PayPal. No subscriptions, no surprises —
+                you pay per session, and only when you book.
               </p>
             </div>
 
@@ -214,15 +211,123 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="text-xl sm:text-2xl font-bold text-[var(--color-text)] font-[family-name:var(--font-heading)]">
-                    Live One-on-One Sessions
+                    Private, One-on-One Sessions
                   </h3>
                   <p className="mt-2 text-[var(--color-text-secondary)] leading-relaxed max-w-lg">
-                    Every session is a private Zoom meeting between you and your tutor.
-                    Get personalized attention, ask questions freely, and learn at your pace.
+                    Every session is private — just you and your teacher.
+                    Ask questions freely, repeat until it clicks, and build
+                    a real rapport over time.
                   </p>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SUBJECTS WE TEACH ─── */}
+      <section className="bg-[var(--color-bg)] py-20 sm:py-28 border-t border-[var(--color-border-light)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-xl mb-14">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)] mb-3">
+              Subjects
+            </p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--color-text)] font-[family-name:var(--font-heading)] leading-tight">
+              What you can<br />study with us<span className="text-[var(--color-accent)]">.</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              {
+                title: 'Qur\u2019an & Tajwīd',
+                body: 'Learn the rules of Tajwīd and recite with confidence. Advanced students can study the ten Qirā\u2019āt with an ijāzah-holding teacher.',
+              },
+              {
+                title: 'Nazirah (Qur\u2019an Reading)',
+                body: 'Learn to read the Qur\u2019an accurately and confidently — whether you\u2019re starting from the beginning or refining your recitation.',
+              },
+              {
+                title: 'English Language',
+                body: 'Build fluency with a native English teacher. Practical usage, clear communication, and proper pronunciation for everyday life.',
+              },
+            ].map((subject) => (
+              <div
+                key={subject.title}
+                className="rounded-2xl bg-[var(--color-bg-white)] border border-[var(--color-border-light)] border-s-4 border-s-[var(--color-accent)] p-8 shadow-[0_4px_24px_-4px_rgba(29,64,64,0.08)] hover:shadow-[0_8px_32px_-4px_rgba(29,64,64,0.12)] transition-shadow duration-200"
+              >
+                <h3 className="text-xl font-semibold text-[var(--color-text)] font-[family-name:var(--font-heading)]">
+                  {subject.title}
+                </h3>
+                <p className="mt-3 text-[var(--color-text-secondary)] leading-relaxed">
+                  {subject.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── MEET OUR TEACHERS ─── */}
+      <section className="bg-[var(--color-surface)] py-20 sm:py-28 border-t border-[var(--color-border-light)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-xl mb-14">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)] mb-3">
+              Our Teachers
+            </p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--color-text)] font-[family-name:var(--font-heading)] leading-tight">
+              Meet the people<br />you&apos;ll learn from<span className="text-[var(--color-accent)]">.</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {[
+              {
+                name: 'Moaz Abied',
+                role: 'Qur\u2019an, Tajwīd & the Ten Qirā\u2019āt',
+                bio: 'A dedicated Qur\u2019an and Tajwīd instructor with over 10 years of experience teaching students of all levels. He holds an ijāzah in the ten Qirā\u2019āt with one of the shortest chains of transmission in the world — ensuring authentic and precise recitation.',
+              },
+              {
+                name: 'Habiba Mowafi',
+                role: 'Qur\u2019an, Tajwīd & Nazirah',
+                bio: 'A Qur\u2019an, Tajwīd, and Nazirah instructor with over 5 years of experience, skilled in teaching both Arab and non-Arab students of all ages.',
+              },
+              {
+                name: 'Hoda Ahmed',
+                role: 'Nazirah (Qur\u2019an Reading)',
+                bio: 'A dedicated Nazirah instructor with experience helping students read the Qur\u2019an accurately and confidently — from the very first letters to fluent recitation.',
+              },
+              {
+                name: 'Azmir',
+                role: 'English Language',
+                bio: 'A native English instructor dedicated to helping students improve their language skills with confidence and fluency. He focuses on clear communication, proper pronunciation, and practical everyday usage.',
+              },
+            ].map((teacher) => (
+              <div
+                key={teacher.name}
+                className="rounded-2xl bg-[var(--color-bg-white)] border border-[var(--color-border-light)] p-8 shadow-[0_4px_24px_-4px_rgba(29,64,64,0.08)] hover:shadow-[0_8px_32px_-4px_rgba(29,64,64,0.12)] transition-shadow duration-200"
+              >
+                <div className="flex items-start gap-5">
+                  <div
+                    className="w-14 h-14 shrink-0 rounded-2xl bg-[var(--color-primary)] text-[var(--color-accent)] flex items-center justify-center font-bold text-xl font-[family-name:var(--font-heading)]"
+                    aria-hidden="true"
+                  >
+                    {teacher.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-bold text-[var(--color-text)] font-[family-name:var(--font-heading)]">
+                      {teacher.name}
+                    </h3>
+                    <p className="mt-1 text-sm font-medium text-[var(--color-accent)]">
+                      {teacher.role}
+                    </p>
+                    <p className="mt-3 text-[var(--color-text-secondary)] leading-relaxed">
+                      {teacher.bio}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -233,13 +338,13 @@ export default function Home() {
 
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)] mb-4">
-            Start Today
+            Begin Your Journey
           </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--color-text)] font-[family-name:var(--font-heading)] leading-tight">
-            Ready to Start<br />Learning<span className="text-[var(--color-accent)]">?</span>
+            Ready to begin<br />your first session<span className="text-[var(--color-accent)]">?</span>
           </h2>
           <p className="mt-5 text-lg text-[var(--color-text-secondary)] max-w-md mx-auto">
-            Join thousands of students finding the right tutors across Egypt.
+            Create your account, find a teacher, and book a time that works for you.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
             <Link
@@ -264,20 +369,23 @@ export default function Home() {
       {/* ─── FOOTER ─── */}
       <footer className="bg-[var(--color-primary)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col items-center gap-6">
+          <div className="flex flex-col items-center gap-4">
             <Link
               href="/"
               className="text-2xl font-bold text-[var(--color-accent)] font-[family-name:var(--font-heading)] tracking-wide"
             >
               Mihraby
             </Link>
+            <p className="text-sm text-[var(--color-text-on-primary)]/60 italic">
+              Empower your mind. Enrich your soul.
+            </p>
 
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-2">
               <Link
                 href="/courses"
                 className="text-sm text-[var(--color-text-on-primary)]/70 hover:text-[var(--color-text-on-primary)] transition-colors"
               >
-                Browse Tutors
+                Find a Teacher
               </Link>
               <Link
                 href="#how-it-works"
@@ -291,9 +399,15 @@ export default function Home() {
               >
                 Log In
               </Link>
+              <a
+                href="mailto:mihrabby@gmail.com"
+                className="text-sm text-[var(--color-text-on-primary)]/70 hover:text-[var(--color-accent)] transition-colors"
+              >
+                mihrabby@gmail.com
+              </a>
             </div>
 
-            <p className="text-xs text-[var(--color-text-muted)]">
+            <p className="text-xs text-[var(--color-text-muted)] mt-4">
               &copy; {new Date().getFullYear()} Mihraby. All rights reserved.
             </p>
           </div>

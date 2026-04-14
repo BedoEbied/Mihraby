@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Standalone output produces .next/standalone/server.js which reads $PORT
+  // and $HOSTNAME from env. Required for the Railway Dockerfile runner stage
+  // and for the later Hetzner+Coolify migration (same image, same pattern).
+  output: 'standalone',
   reactCompiler: true,
   images: {
     qualities: [70, 75, 90],

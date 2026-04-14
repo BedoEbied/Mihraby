@@ -79,7 +79,7 @@ export type BookingStatus =
   | 'no_show';
 
 export type PaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
-export type PaymentMethod = 'paymob_card' | 'paymob_wallet' | 'paymob_fawry' | 'instapay';
+export type PaymentMethod = 'paymob_card' | 'paymob_wallet' | 'paymob_fawry' | 'instapay' | 'paypal';
 
 /**
  * Meeting state for a booking.

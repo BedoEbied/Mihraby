@@ -3,8 +3,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// DB_CLIENT is parameterized so the later Postgres swap (Hetzner+Coolify
+// migration) is a single env var change plus the targeted schema/errno PR.
+// Default stays 'mysql2' — zero behavior change at launch.
 const baseConfig: Knex.Config = {
-  client: 'mysql2',
+  client: process.env.DB_CLIENT || 'mysql2',
   connection: {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',

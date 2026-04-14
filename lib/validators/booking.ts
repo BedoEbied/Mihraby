@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const paymentMethodEnum = z.enum(['paymob_card', 'paymob_wallet', 'paymob_fawry', 'instapay']);
+const paymentMethodEnum = z.enum(['paymob_card', 'paymob_wallet', 'paymob_fawry', 'instapay', 'paypal']);
 
 export const initiateBookingSchema = z.object({
   slot_id: z.number().int().positive('Slot ID is required'),

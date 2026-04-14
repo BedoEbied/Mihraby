@@ -126,7 +126,7 @@ export class Course {
         price_per_slot = 0,
         meeting_platform = 'manual',
         meeting_link,
-        currency = 'EGP',
+        currency = 'USD',
       } = courseData;
 
       const [result] = await pool.query<ResultSetHeader>(

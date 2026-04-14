@@ -16,7 +16,7 @@
  *   Zod validators use `z.string().datetime()` which enforces this.
  */
 
-export const APP_TIMEZONE = 'Africa/Cairo';
+export const APP_TIMEZONE = 'America/Chicago';
 
 /**
  * Serialize a Date to the ISO 8601 UTC string that our API contracts use.

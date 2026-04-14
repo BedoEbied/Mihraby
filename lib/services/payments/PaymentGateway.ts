@@ -13,7 +13,7 @@ export interface PaymentGateway {
   /**
    * Human-readable name used in logs and error messages.
    */
-  readonly name: 'paymob' | 'kashier';
+  readonly name: 'paymob' | 'kashier' | 'paypal';
 
   /**
    * Create a hosted checkout session for the given booking and return the URL
@@ -47,6 +47,25 @@ export interface PaymentGateway {
    * service can act on. Throws if the payload is malformed.
    */
   parseWebhookEvent(payload: unknown): ParsedWebhookEvent;
+
+  /**
+   * Optional: capture a previously authorized order. Used by hosted-checkout
+   * providers (e.g. PayPal) that confirm payment synchronously on return
+   * rather than via an async webhook. Gateways that confirm via webhook
+   * should leave this undefined.
+   */
+  captureOrder?(orderId: string, bookingId: number): Promise<CaptureResult>;
+}
+
+export interface CaptureResult {
+  /** True if PayPal reported the capture as COMPLETED. */
+  success: boolean;
+  /** Gateway-specific transaction id to store on the booking. */
+  transactionId: string;
+  /** Captured amount in major currency units (USD). */
+  amount: number;
+  /** Raw gateway response for logging / debugging. */
+  raw: unknown;
 }
 
 export interface CreateCheckoutOptions {
@@ -55,7 +74,7 @@ export interface CreateCheckoutOptions {
    * may expose multiple rails (card vs. wallet vs. Fawry) as different
    * integration IDs, so the implementation needs to know which one to pick.
    */
-  method: Extract<PaymentMethod, 'paymob_card' | 'paymob_wallet' | 'paymob_fawry'>;
+  method: Extract<PaymentMethod, 'paymob_card' | 'paymob_wallet' | 'paymob_fawry' | 'paypal'>;
   /**
    * URL the gateway should redirect the student to after payment completes
    * (regardless of success/failure). Typically our `/booking/[id]/return` page.

@@ -7,6 +7,8 @@ export {
   useUpdateBookingStatus,
   useBookingDetail,
   useCreateCheckoutSession,
+  useInitiatePaypalCheckout,
+  useCapturePaypalOrder,
   useUploadPaymentProof,
   useAdminApproveBooking,
   useAdminRejectBooking,
