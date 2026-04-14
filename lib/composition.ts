@@ -22,6 +22,7 @@ import { PaymobGateway } from '@/lib/services/payments/PaymobGateway';
 import { PayPalGateway } from '@/lib/services/payments/PayPalGateway';
 import { MockPaymentGateway } from '@/lib/services/payments/MockPaymentGateway';
 import { LocalDiskStorage } from '@/lib/storage/LocalDiskStorage';
+import { DisabledStorage } from '@/lib/storage/DisabledStorage';
 
 let paymentGateway: PaymentGateway | null = null;
 let meetingProvider: MeetingProvider | null = null;
@@ -90,14 +91,25 @@ export function setMeetingProvider(provider: MeetingProvider): void {
 
 /**
  * Returns the active file storage for the current environment.
- * Wired in Phase 4.
+ *
+ * Selection:
+ *   - STORAGE_ENABLED !== 'true' → DisabledStorage (default at US launch —
+ *     PayPal path is storage-free, Railway filesystem is ephemeral).
+ *   - STORAGE_ENABLED === 'true' → LocalDiskStorage (local dev, Egypt flow).
+ *     Post-launch track T3 swaps this to R2Storage when durable object
+ *     storage is wired.
  */
 export function getFileStorage(): FileStorage {
   if (!fileStorage) {
-    fileStorage = new LocalDiskStorage({
-      uploadsDir: process.env.UPLOADS_DIR,
-    });
-    console.log('[composition] FileStorage: LocalDiskStorage');
+    if (process.env.STORAGE_ENABLED !== 'true') {
+      fileStorage = new DisabledStorage();
+      console.log('[composition] FileStorage: DisabledStorage (STORAGE_ENABLED != true)');
+    } else {
+      fileStorage = new LocalDiskStorage({
+        uploadsDir: process.env.UPLOADS_DIR,
+      });
+      console.log('[composition] FileStorage: LocalDiskStorage');
+    }
   }
   return fileStorage;
 }
