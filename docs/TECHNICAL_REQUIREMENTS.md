@@ -5,6 +5,11 @@
 **Version:** 2.0 - Phase 2 Implementation  
 **Last Updated:** January 4, 2026  
 
+> **📌 Canonical scope lives in [`ROADMAP.md`](./ROADMAP.md).** This document
+> is long-form background material — epics, user stories, and
+> requirements-gathering notes. Where this file and `ROADMAP.md` disagree on
+> scope, phasing, or acceptance criteria, `ROADMAP.md` wins.
+
 ---
 
 ## 📋 Table of Contents
@@ -557,7 +562,7 @@ SMTP_FROM=noreply@mihraby.com
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=password
-DB_NAME=tahbeer
+DB_NAME=mihraby_db
 ```
 
 ---
