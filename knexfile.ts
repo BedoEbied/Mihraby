@@ -31,6 +31,4 @@ const config: { [key: string]: Knex.Config } = {
   production: baseConfig
 };
 
-// Export default for ESM-aware tooling while keeping CommonJS compatibility for Knex CLI require.
 export default config;
-module.exports = config;

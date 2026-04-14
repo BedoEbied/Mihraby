@@ -25,6 +25,9 @@ export default async function InstructorLayout({ children }: { children: ReactNo
                 <Link href="/instructor/courses" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors py-2 whitespace-nowrap">
                   My Courses
                 </Link>
+                <Link href="/instructor/bookings" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors py-2 whitespace-nowrap">
+                  My Sessions
+                </Link>
                 <Link href="/instructor/courses/new" className="text-[var(--color-text-on-primary)]/80 hover:text-[var(--color-text-on-primary)] transition-colors py-2">
                   Create
                 </Link>
