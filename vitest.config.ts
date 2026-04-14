@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 import path from 'path';
 
 export default defineConfig({
@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/setup.ts'],
-    exclude: ['tests/e2e/**', 'node_modules/**'],
+    exclude: [...configDefaults.exclude, 'tests/e2e/**', '**/.next/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
