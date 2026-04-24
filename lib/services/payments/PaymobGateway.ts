@@ -119,8 +119,15 @@ export class PaymobGateway implements PaymentGateway {
   }
 
   parseWebhookEvent(payload: unknown): ParsedWebhookEvent {
-    const data = payload as Record<string, any>;
-    const obj = data.obj ?? data;
+    const data = payload as Record<string, unknown>;
+    const obj = (data.obj ?? data) as Record<string, unknown> & {
+      order?: { merchant_order_id?: string; id?: string | number };
+      merchant_order_id?: string;
+      success?: boolean;
+      id?: string | number;
+      amount_cents?: number;
+      source_data?: { sub_type?: string };
+    };
 
     const merchantOrderId = obj.order?.merchant_order_id
       ?? obj.merchant_order_id
@@ -198,7 +205,7 @@ export class PaymobGateway implements PaymentGateway {
     }
   }
 
-  private detectMethod(obj: Record<string, any>): PaymentMethod {
+  private detectMethod(obj: { source_data?: { sub_type?: string } }): PaymentMethod {
     const subType = obj.source_data?.sub_type?.toLowerCase() ?? '';
     if (subType.includes('wallet')) return 'paymob_wallet';
     if (subType.includes('fawry')) return 'paymob_fawry';

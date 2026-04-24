@@ -82,6 +82,10 @@ export class PayPalGateway implements PaymentGateway {
   }
 
   private get apiBase(): string {
+    // PAYPAL_API_BASE is a test-only escape hatch — Playwright points this
+    // at a local mock server. In production it is unset and we fall back to
+    // the real PayPal endpoints.
+    if (process.env.PAYPAL_API_BASE) return process.env.PAYPAL_API_BASE;
     return this.config.environment === 'live'
       ? 'https://api-m.paypal.com'
       : 'https://api-m.sandbox.paypal.com';

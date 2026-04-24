@@ -18,7 +18,7 @@ async function handler(
       pending: 'pending_payment',
     };
     const dbStatus = statusParam && statusParam !== 'all'
-      ? (statusMap[statusParam] ?? statusParam) as any
+      ? (statusMap[statusParam] ?? statusParam) as Parameters<typeof BookingService.listForStudent>[1]
       : undefined;
 
     const bookings = await BookingService.listForStudent(

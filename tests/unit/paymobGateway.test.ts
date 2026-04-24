@@ -36,7 +36,7 @@ function makeWebhookObj(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function computeHmac(obj: Record<string, unknown>): string {
+function computeHmac(obj: ReturnType<typeof makeWebhookObj>): string {
   const concatenated = [
     obj.amount_cents, obj.created_at, obj.currency, obj.error_occured,
     obj.has_parent_transaction, obj.id, obj.integration_id, obj.is_3d_secure,

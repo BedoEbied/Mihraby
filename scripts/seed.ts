@@ -2,16 +2,27 @@
  * Seed script for local/testing.
  * Requires DB env vars to be set; uses the same connection as the app.
  * Inserts a handful of users, courses, and enrollments.
+ *
+ * Set SEED_E2E=1 to also insert a future-dated time slot and a
+ * `pending_payment` booking owned by student1 — used by the Playwright
+ * PayPal suite, but safe to leave out in day-to-day dev.
  */
 import 'dotenv/config';
+import bcrypt from 'bcryptjs';
 import pool from '../lib/db/connection';
 import { UserRole } from '../types';
+
+const SEED_PASSWORD = 'password123';
 
 async function main() {
   console.log('Seeding database...', {
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
+    seedE2E: process.env.SEED_E2E === '1',
   });
+
+  const passwordHash = await bcrypt.hash(SEED_PASSWORD, 10);
+
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
@@ -20,11 +31,11 @@ async function main() {
     const [userInsert] = await conn.query(
       'INSERT IGNORE INTO users (email, password, name, role) VALUES ?',
       [[
-        ['admin@example.com', '$2b$10$seedadmin', 'Admin User', UserRole.ADMIN],
-        ['instructor1@example.com', '$2b$10$seedinstr', 'Instructor One', UserRole.INSTRUCTOR],
-        ['instructor2@example.com', '$2b$10$seedinstr', 'Instructor Two', UserRole.INSTRUCTOR],
-        ['student1@example.com', '$2b$10$seedstud', 'Student One', UserRole.STUDENT],
-        ['student2@example.com', '$2b$10$seedstud', 'Student Two', UserRole.STUDENT],
+        ['admin@example.com', passwordHash, 'Admin User', UserRole.ADMIN],
+        ['instructor1@example.com', passwordHash, 'Instructor One', UserRole.INSTRUCTOR],
+        ['instructor2@example.com', passwordHash, 'Instructor Two', UserRole.INSTRUCTOR],
+        ['student1@example.com', passwordHash, 'Student One', UserRole.STUDENT],
+        ['student2@example.com', passwordHash, 'Student Two', UserRole.STUDENT],
       ]]
     );
     console.log('Users inserted/ignored:', (userInsert as { affectedRows?: number }).affectedRows ?? 0);

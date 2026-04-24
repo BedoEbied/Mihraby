@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-typecheck-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+      - run: yarn typecheck
+      - run: yarn test
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: mihraby
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      DB_CLIENT: mysql2
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: mihraby
+      JWT_SECRET: ci_test_secret_minimum_thirty_two_chars_long_abcdef
+      # Throwaway 32-byte base64 key for CI only — never used in production.
+      APP_ENCRYPTION_KEY: Zsde0w7FZnK0pvvIIfTxvNlMD9CmEXnB8AcsGDgUBUA=
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      PLAYWRIGHT_BASE_URL: http://localhost:3000
+      PAYPAL_ENV: sandbox
+      PAYPAL_CLIENT_ID: test_client_id
+      PAYPAL_CLIENT_SECRET: test_client_secret
+      STORAGE_ENABLED: "false"
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      # The `services:` healthcheck runs as the docker daemon sees MySQL, but
+      # we still need to confirm it's accepting connections from the runner
+      # network before running migrations. 60s wall-clock cap.
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -proot --silent; then
+              echo "MySQL is up"
+              exit 0
+            fi
+            echo "MySQL not ready yet (attempt $i)…"
+            sleep 2
+          done
+          echo "MySQL failed to come up"
+          exit 1
+
+      - name: Run migrations
+        run: yarn migrate:up
+
+      - name: Seed database
+        run: yarn db:seed
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Next.js
+        run: yarn build
+
+      - name: Run Playwright tests
+        run: yarn test:e2e:ci
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

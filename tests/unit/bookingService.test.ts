@@ -65,7 +65,9 @@ const makeBooking = (overrides: Partial<IBooking> = {}): IBooking => ({
 // Mocks
 // ---------------------------------------------------------------------------
 
-const mockConn = { query: vi.fn() } as any;
+import type { PoolConnection } from 'mysql2/promise';
+
+const mockConn = { query: vi.fn() } as unknown as PoolConnection;
 
 vi.mock('@/lib/db/models/TimeSlot', () => ({
   TimeSlot: {
@@ -96,13 +98,13 @@ vi.mock('@/lib/db/models/Course', () => ({
 
 // Mock withTransaction to execute the callback with our fake conn
 vi.mock('@/lib/db/transaction', () => ({
-  withTransaction: vi.fn(async (fn: (conn: any) => Promise<any>) => fn(mockConn)),
+  withTransaction: vi.fn(async (fn: (conn: PoolConnection) => Promise<unknown>) => fn(mockConn)),
   isDuplicateEntryError: vi.fn(
     (error: unknown) =>
       typeof error === 'object' &&
       error !== null &&
       'errno' in error &&
-      (error as any).errno === 1062
+      (error as { errno?: number }).errno === 1062
   ),
 }));
 
